@@ -42,25 +42,42 @@
                 <h1 class="text-2xl font-bold text-gray-900">Tracked Products</h1>
                 <p class="text-gray-500 mt-1" id="product-count"></p>
             </div>
-            <a href="https://github.com/rvr8/price-monitor/issues/new?template=add-product.yml" target="_blank"
-                class="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition font-medium text-sm">
+            <button onclick="toggleAddPanel()" id="add-btn" class="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition font-medium text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Add Product
-            </a>
+            </button>
         </div>
 
-        <!-- Add Product / Add Retailer links -->
-        <div class="flex gap-3 mb-6">
-            <a href="https://github.com/rvr8/price-monitor/issues/new?template=add-product.yml" target="_blank"
-                class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:border-brand-300 hover:shadow transition text-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                Track New Product
-            </a>
-            <a href="https://github.com/rvr8/price-monitor/issues/new?template=add-retailer.yml" target="_blank"
-                class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:border-brand-300 hover:shadow transition text-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                Add Retailer URL
-            </a>
+        <!-- Add Product Panel (inline, not a modal) -->
+        <div id="add-panel" class="hidden mb-8 bg-white rounded-xl border border-brand-200 p-6 shadow-sm">
+            <!-- One-time setup -->
+            <div id="setup-box" class="hidden mb-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p class="text-sm font-medium text-amber-800 mb-2">One-time setup (30 seconds)</p>
+                <p class="text-xs text-amber-700 mb-3">To search and add products, paste a GitHub token. This is stored only in your browser and never sent anywhere except GitHub.</p>
+                <ol class="text-xs text-amber-700 mb-3 space-y-1 list-decimal pl-4">
+                    <li>Open <a href="https://github.com/settings/tokens/new?scopes=repo&description=price-monitor" target="_blank" class="underline font-medium">github.com/settings/tokens</a></li>
+                    <li>Click "Generate token" (repo scope is pre-selected)</li>
+                    <li>Copy and paste it below</li>
+                </ol>
+                <div class="flex gap-2">
+                    <input type="password" id="token-input" placeholder="ghp_..." class="flex-1 px-3 py-2 border border-amber-300 rounded-lg text-sm bg-white">
+                    <button onclick="saveToken()" class="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700">Save</button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div id="search-box">
+                <p class="text-sm text-gray-600 mb-3">Search across all Romanian retailers. Type a product name:</p>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="search-input" placeholder="e.g. Cybex Eezy S Twist, Bugaboo Fox, Joie Litetrax..."
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+                        onkeydown="if(event.key==='Enter')addProduct()">
+                    <button onclick="addProduct()" id="search-btn" class="bg-brand-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-brand-700 whitespace-nowrap">
+                        Search & Track
+                    </button>
+                </div>
+                <div id="add-status" class="hidden"></div>
+            </div>
         </div>
 
         <div id="products-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -178,6 +195,127 @@ async function loadDashboard() {
 
 loadDashboard();
 
+// --- Add Product ---
+const REPO = 'rvr8/price-monitor';
+
+function toggleAddPanel() {
+    const panel = document.getElementById('add-panel');
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+        document.getElementById('setup-box').classList.toggle('hidden', !!localStorage.getItem('gh_token'));
+        document.getElementById('search-input').focus();
+    }
+}
+
+function saveToken() {
+    const token = document.getElementById('token-input').value.trim();
+    if (!token) return;
+    localStorage.setItem('gh_token', token);
+    document.getElementById('setup-box').classList.add('hidden');
+    document.getElementById('search-input').focus();
+}
+
+function showStatus(html, type) {
+    const el = document.getElementById('add-status');
+    el.classList.remove('hidden');
+    const colors = { info: 'bg-blue-50 border-blue-200 text-blue-700', error: 'bg-red-50 border-red-200 text-red-700', success: 'bg-emerald-50 border-emerald-200 text-emerald-700' };
+    el.className = `rounded-lg border p-4 text-sm ${colors[type] || colors.info}`;
+    el.innerHTML = html;
+}
+
+async function addProduct() {
+    const token = localStorage.getItem('gh_token');
+    if (!token) {
+        document.getElementById('setup-box').classList.remove('hidden');
+        return;
+    }
+
+    const query = document.getElementById('search-input').value.trim();
+    if (!query) return;
+
+    const btn = document.getElementById('search-btn');
+    btn.disabled = true;
+    btn.textContent = 'Searching...';
+
+    showStatus(`
+        <div class="flex items-center gap-3">
+            <div class="animate-spin w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
+            <div>
+                <div class="font-medium">Searching all retailers for "${query}"...</div>
+                <div class="text-xs opacity-75 mt-1">This runs on GitHub servers. Takes 30-60 seconds.</div>
+            </div>
+        </div>
+    `, 'info');
+
+    try {
+        // Trigger the workflow
+        const dispatchResp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/add-product.yml/dispatches`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json' },
+            body: JSON.stringify({ ref: 'main', inputs: { action: 'track-group', query: query, group_number: '1' } }),
+        });
+
+        if (dispatchResp.status === 401 || dispatchResp.status === 403) {
+            localStorage.removeItem('gh_token');
+            showStatus('Token expired or invalid. Please set up a new one.', 'error');
+            document.getElementById('setup-box').classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = 'Search & Track';
+            return;
+        }
+
+        if (!dispatchResp.ok) throw new Error('Failed to start search: ' + dispatchResp.status);
+
+        // Wait for the workflow to complete
+        const startTime = new Date();
+        let completed = false;
+
+        for (let i = 0; i < 40; i++) {
+            await new Promise(r => setTimeout(r, 3000));
+            const runsResp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/add-product.yml/runs?per_page=1`, {
+                headers: { 'Authorization': 'Bearer ' + token },
+            });
+            const runs = await runsResp.json();
+            const run = runs.workflow_runs?.[0];
+
+            if (run && new Date(run.created_at) > startTime) {
+                if (run.status === 'completed') {
+                    completed = true;
+                    if (run.conclusion === 'success') {
+                        showStatus(`
+                            <div class="font-medium">Product added successfully!</div>
+                            <div class="text-xs mt-1">Refreshing dashboard...</div>
+                        `, 'success');
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        showStatus('Search completed but no matching products found. Try a different name.', 'error');
+                    }
+                    break;
+                }
+
+                const elapsed = Math.round((Date.now() - startTime) / 1000);
+                showStatus(`
+                    <div class="flex items-center gap-3">
+                        <div class="animate-spin w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
+                        <div>
+                            <div class="font-medium">Searching retailers... (${elapsed}s)</div>
+                            <div class="text-xs opacity-75 mt-1">Checking ToysForKids, BabyNeeds and more...</div>
+                        </div>
+                    </div>
+                `, 'info');
+            }
+        }
+
+        if (!completed) {
+            showStatus('Taking longer than expected. Check back in a minute and refresh the page.', 'info');
+        }
+    } catch (e) {
+        showStatus('Error: ' + e.message, 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Search & Track';
+}
 </script>
 </body>
 </html>
