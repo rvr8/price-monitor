@@ -213,25 +213,47 @@ function renderChart(product, history) {
         cutoff = cutoff.toISOString();
     }
 
-    product.tracked_urls.forEach((tracked, idx) => {
-        let points = history
-            .filter(h => h.url === tracked.url)
-            .filter(h => !cutoff || h.checked_at >= cutoff)
-            .map(h => ({ x: h.checked_at, y: h.price }));
+    // Group by RETAILER — one line per retailer showing best daily price
+    const retailerColors = {
+        'ToysForKids': '#3b82f6',
+        'BabyNeeds': '#10b981',
+        'eMAG': '#f59e0b',
+        'Nichiduta': '#ef4444',
+        'Origami': '#8b5cf6',
+    };
+    const defaultColors = ['#ec4899', '#14b8a6', '#f97316', '#6366f1'];
 
-        // Aggregate to daily data points
-        points = aggregateByDay(points);
+    const retailers = [...new Set(product.tracked_urls.map(t => t.retailer))];
+
+    retailers.forEach((retailer, idx) => {
+        const retailerUrls = product.tracked_urls.filter(t => t.retailer === retailer).map(t => t.url);
+        const retailerHistory = history
+            .filter(h => retailerUrls.includes(h.url))
+            .filter(h => !cutoff || h.checked_at >= cutoff);
+
+        // Per day, take the BEST (lowest) price across all variants for this retailer
+        const byDay = {};
+        for (const h of retailerHistory) {
+            const day = h.checked_at.substring(0, 10);
+            if (!byDay[day] || h.price < byDay[day].price) {
+                byDay[day] = { x: h.checked_at, y: h.price };
+            }
+        }
+        const points = Object.values(byDay).sort((a, b) => a.x.localeCompare(b.x));
         if (points.length === 0) return;
 
+        const color = retailerColors[retailer] || defaultColors[idx % defaultColors.length];
         datasets.push({
-            label: tracked.variant_name || tracked.retailer,
+            label: retailer,
             data: points,
-            borderColor: colors[idx % colors.length],
-            backgroundColor: colors[idx % colors.length] + '20',
+            borderColor: color,
+            backgroundColor: color + '20',
+            borderWidth: 3,
             tension: 0.3,
             fill: false,
-            pointRadius: 4,
-            pointHoverRadius: 6,
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            pointBackgroundColor: color,
         });
     });
 
@@ -281,32 +303,63 @@ function renderChart(product, history) {
 
 function renderBuyList(product, latestByUrl) {
     const list = document.getElementById('buy-list');
-    const items = product.tracked_urls
-        .map(t => ({ ...t, latest: latestByUrl[t.url] }))
-        .filter(t => t.latest)
-        .sort((a, b) => a.latest.price - b.latest.price);
+    const retailerColors = {
+        'ToysForKids': { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', dot: '#3b82f6' },
+        'BabyNeeds': { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', dot: '#10b981' },
+        'eMAG': { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', dot: '#f59e0b' },
+    };
+    const defaultStyle = { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700', dot: '#6b7280' };
 
-    list.innerHTML = items.map((t, i) => `
-        <div class="flex items-center justify-between p-3 rounded-lg
-            ${i === 0 ? 'bg-brand-50 border border-brand-200' : 'bg-gray-50 border border-gray-100'}">
-            <div class="flex items-center gap-3 min-w-0">
-                ${i === 0 ? '<span class="bg-brand-600 text-white text-xs font-bold px-2 py-0.5 rounded flex-shrink-0">BEST</span>' : ''}
-                <div class="min-w-0">
-                    <div class="font-medium text-gray-900">${t.retailer}</div>
-                    <a href="${t.url}" target="_blank" class="text-xs text-brand-500 hover:underline truncate block">${t.variant_name || 'View product'}</a>
+    // Group by retailer, show best price per retailer
+    const retailers = [...new Set(product.tracked_urls.map(t => t.retailer))];
+    const retailerData = retailers.map(retailer => {
+        const urls = product.tracked_urls.filter(t => t.retailer === retailer);
+        const items = urls.map(t => ({ ...t, latest: latestByUrl[t.url] })).filter(t => t.latest);
+        const best = items.length ? items.reduce((a, b) => a.latest.price < b.latest.price ? a : b) : null;
+        const inStock = items.filter(t => t.latest.in_stock).length;
+        return { retailer, items, best, inStock, total: items.length };
+    }).filter(r => r.best).sort((a, b) => a.best.latest.price - b.best.latest.price);
+
+    list.innerHTML = retailerData.map((r, i) => {
+        const style = retailerColors[r.retailer] || defaultStyle;
+        const isBest = i === 0;
+        return `
+        <div class="rounded-lg border ${isBest ? style.border + ' ' + style.bg : 'border-gray-100 bg-gray-50'} overflow-hidden">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-3 h-3 rounded-full flex-shrink-0" style="background:${style.dot}"></div>
+                    ${isBest ? '<span class="bg-brand-600 text-white text-xs font-bold px-2 py-0.5 rounded flex-shrink-0">BEST</span>' : ''}
+                    <div class="min-w-0">
+                        <div class="font-bold text-gray-900 text-lg">${r.retailer}</div>
+                        <div class="text-xs text-gray-500">${r.inStock}/${r.total} variants in stock</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 flex-shrink-0">
+                    ${r.inStock > 0
+                        ? '<span class="inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> In stock</span>'
+                        : '<span class="inline-flex items-center gap-1 text-xs text-gray-400"><span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span> Unavailable</span>'}
+                    <div class="text-right">
+                        <div class="text-sm text-gray-400">from</div>
+                        <div class="text-2xl font-bold ${isBest ? 'text-brand-600' : 'text-gray-700'}">${Math.round(r.best.latest.price)} Lei</div>
+                        ${r.best.latest.original_price ? `<div class="text-xs text-gray-400 line-through">${Math.round(r.best.latest.original_price)} Lei</div>` : ''}
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center gap-4 flex-shrink-0">
-                ${t.latest.in_stock
-                    ? '<span class="inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> In stock</span>'
-                    : '<span class="inline-flex items-center gap-1 text-xs text-gray-400"><span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span> Unavailable</span>'}
-                <div class="text-right">
-                    <div class="text-lg font-bold ${i === 0 ? 'text-brand-600' : 'text-gray-700'}">${Math.round(t.latest.price)} Lei</div>
-                    ${t.latest.original_price ? `<div class="text-xs text-gray-400 line-through">${Math.round(t.latest.original_price)} Lei</div>` : ''}
+            ${r.items.length > 1 ? `
+            <div class="border-t border-gray-100 px-4 py-2 bg-white/50">
+                <div class="flex flex-wrap gap-2">
+                    ${r.items.sort((a,b) => a.latest.price - b.latest.price).map(t => `
+                        <a href="${t.url}" target="_blank" class="text-xs px-2 py-1 rounded bg-white border border-gray-200 hover:border-brand-300 text-gray-600 hover:text-brand-600">
+                            ${t.variant_name ? t.variant_name.substring(0, 30) : 'variant'} — ${Math.round(t.latest.price)} Lei
+                        </a>
+                    `).join('')}
                 </div>
-            </div>
-        </div>
-    `).join('');
+            </div>` : `
+            <div class="border-t border-gray-100 px-4 py-2 bg-white/50">
+                <a href="${r.best.url}" target="_blank" class="text-xs text-brand-500 hover:underline">View on ${r.retailer}</a>
+            </div>`}
+        </div>`;
+    }).join('');
 }
 
 function renderAlerts(product, avg) {
