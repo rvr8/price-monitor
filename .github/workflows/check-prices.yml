@@ -18,7 +18,9 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install httpx beautifulsoup4 lxml
+        run: |
+          pip install httpx beautifulsoup4 lxml playwright
+          playwright install chromium --with-deps
 
       - name: Check prices
         run: python check_prices.py

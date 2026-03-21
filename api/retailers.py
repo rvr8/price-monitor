@@ -53,9 +53,9 @@ RETAILERS = [
         "id": "emag",
         "name": "eMAG",
         "url": "https://www.emag.ro",
-        "mechanism": "Blocked — eMAG blocks automated scraping (403/captcha)",
+        "mechanism": "Playwright headless Chromium (price checking in GitHub Actions only)",
         "supports_search": False,
-        "color": "#6b7280",
+        "color": "#f59e0b",
     },
 ]
 

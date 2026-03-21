@@ -4,10 +4,11 @@ from src.scrapers.babyneeds import BabyNeedsScraper
 from src.scrapers.toysforkids import ToysForKidsScraper
 from src.scrapers.babymatters import BabyMattersScraper
 from src.scrapers.gomag import ErFiScraper, CaruselulCuViseScraper
+from src.scrapers.emag_playwright import EmagPlaywrightScraper
 
 SCRAPERS = {
-    "emag.ro": EmagScraper,
-    "www.emag.ro": EmagScraper,
+    "emag.ro": EmagPlaywrightScraper,
+    "www.emag.ro": EmagPlaywrightScraper,
     "babyneeds.ro": BabyNeedsScraper,
     "www.babyneeds.ro": BabyNeedsScraper,
     "toysforkids.ro": ToysForKidsScraper,
