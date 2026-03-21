@@ -27,7 +27,7 @@
         }
       ],
       "alerts": [],
-      "check_frequency_hours": 6,
+      "check_frequency_hours": 24,
       "last_checked": "2026-03-21T21:21:41Z"
     },
     {
