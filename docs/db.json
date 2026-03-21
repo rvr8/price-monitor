@@ -68,6 +68,36 @@
       ],
       "alerts": [],
       "last_checked": "2026-03-21T21:53:05Z"
+    },
+    {
+      "id": "product-1",
+      "name": "Cybex Balios S Lux",
+      "image_url": "https://www.toysforkids.ro/images/detailed/126/CYB_25_INT_y045_BaliosSLux_TPE_MGRE_print_medium.jpg",
+      "tracked_urls": [
+        {
+          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
+          "retailer": "ToysForKids",
+          "variant_name": "carucior balios s lux cybex blk moon black"
+        },
+        {
+          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
+          "retailer": "ToysForKids",
+          "variant_name": "carucior balios s lux cybex moon black"
+        },
+        {
+          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
+          "retailer": "ToysForKids",
+          "variant_name": "carucior balios s lux cybex almond beige"
+        },
+        {
+          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
+          "retailer": "ToysForKids",
+          "variant_name": "carucior balios s lux cybex sky blue"
+        }
+      ],
+      "alerts": [],
+      "check_frequency_hours": 24,
+      "last_checked": "2026-03-21T21:51:46Z"
     }
   ],
   "price_history": [
@@ -585,37 +615,5 @@
     }
   ],
   "last_checked": "2026-03-21T21:53:05Z",
-  "archived_products": [
-    {
-      "id": "product-1",
-      "name": "Cybex Balios S Lux",
-      "image_url": "https://www.toysforkids.ro/images/detailed/126/CYB_25_INT_y045_BaliosSLux_TPE_MGRE_print_medium.jpg",
-      "tracked_urls": [
-        {
-          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-          "retailer": "ToysForKids",
-          "variant_name": "carucior balios s lux cybex blk moon black"
-        },
-        {
-          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-          "retailer": "ToysForKids",
-          "variant_name": "carucior balios s lux cybex moon black"
-        },
-        {
-          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-          "retailer": "ToysForKids",
-          "variant_name": "carucior balios s lux cybex almond beige"
-        },
-        {
-          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-          "retailer": "ToysForKids",
-          "variant_name": "carucior balios s lux cybex sky blue"
-        }
-      ],
-      "alerts": [],
-      "check_frequency_hours": 24,
-      "last_checked": "2026-03-21T21:51:46Z",
-      "archived_at": "2026-03-21T21:52:46Z"
-    }
-  ]
+  "archived_products": []
 }
