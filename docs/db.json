@@ -54,7 +54,8 @@
           "variant_name": "Carucior Bugaboo Fox Cub Black/Stormy Blue 2 in 1"
         }
       ],
-      "alerts": []
+      "alerts": [],
+      "check_frequency_hours": 24
     }
   ],
   "price_history": [
