@@ -99,7 +99,25 @@ class handler(BaseHTTPRequestHandler):
             product["last_checked"] = now
             db["last_checked"] = now
 
-            _put_db_to_github(db, sha, f"check: {product['name']} (manual)")
+            # Commit with retry on SHA conflict (409)
+            price_records = [h for h in db["price_history"] if h.get("checked_at") == now]
+            for attempt in range(3):
+                try:
+                    _put_db_to_github(db, sha, f"check: {product['name']} (manual)")
+                    break
+                except Exception as e:
+                    if "409" in str(e) and attempt < 2:
+                        # SHA conflict — re-fetch and re-apply our changes
+                        import time
+                        time.sleep(1)
+                        db, sha = _get_db_from_github()
+                        product = next((p for p in db["products"] if p["id"] == product_id), None)
+                        if product:
+                            product["last_checked"] = now
+                            db["price_history"].extend(price_records)
+                            db["last_checked"] = now
+                    else:
+                        raise
 
             self._json_response(200, {
                 "status": "checked",

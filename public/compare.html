@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare — Price Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { brand: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' }}}}
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 via-white to-blue-50 min-h-screen flex flex-col">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-xl font-bold text-brand-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                Price Monitor
+            </a>
+            <div class="flex items-center gap-4 text-sm">
+                <a href="index.html" class="text-gray-500 hover:text-brand-600">Dashboard</a>
+                <a href="retailers.html" class="text-gray-500 hover:text-brand-600">Retailers</a>
+                <span class="text-brand-600 font-medium">Compare</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full">
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">Compare Products</h1>
+        <p class="text-sm text-gray-500 mb-6">Select 2-3 products to compare their price history side by side.</p>
+
+        <!-- Product selector -->
+        <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+            <div id="product-checkboxes" class="flex flex-wrap gap-3">
+                <span class="text-gray-400 text-sm">Loading products...</span>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6" id="chart-container" style="display:none">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Price Comparison</h2>
+            <div class="relative" style="height: 400px;">
+                <canvas id="compareChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Comparison table -->
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6" id="table-container" style="display:none">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="text-left px-4 py-3 font-semibold text-gray-700">Product</th>
+                        <th class="text-right px-4 py-3 font-semibold text-gray-700">Best Now</th>
+                        <th class="text-right px-4 py-3 font-semibold text-gray-700">All-Time Low</th>
+                        <th class="text-right px-4 py-3 font-semibold text-gray-700">Average</th>
+                        <th class="text-right px-4 py-3 font-semibold text-gray-700">Retailers</th>
+                    </tr>
+                </thead>
+                <tbody id="compare-table"></tbody>
+            </table>
+        </div>
+
+        <div id="empty-state" class="text-center py-12 text-gray-400">
+            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <p>Select 2 or more products above to compare</p>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center text-gray-400 text-sm">
+            Price Monitor — Tracking prices across Romanian retailers
+        </div>
+    </footer>
+
+<script>
+const DB_URL_PRIMARY = 'https://api.github.com/repos/rvr8/price-monitor/contents/docs/db.json';
+const DB_URL_FALLBACK = '/db.json';
+
+async function fetchDb() {
+    try {
+        const resp = await fetch(DB_URL_PRIMARY, { headers: { 'Accept': 'application/vnd.github.v3.raw' } });
+        if (resp.ok) return resp.json();
+    } catch {}
+    return (await fetch(DB_URL_FALLBACK + '?t=' + Date.now())).json();
+}
+
+const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+let db = null;
+let chartInstance = null;
+
+async function init() {
+    db = await fetchDb();
+    const container = document.getElementById('product-checkboxes');
+
+    if (!db.products.length) {
+        container.innerHTML = '<span class="text-gray-400">No products tracked yet</span>';
+        return;
+    }
+
+    container.innerHTML = db.products.map((p, i) => {
+        const history = db.price_history.filter(h => h.product_id === p.id);
+        const prices = history.map(h => h.price);
+        const best = prices.length ? Math.min(...prices) : null;
+        return `
+        <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 hover:border-brand-300 cursor-pointer transition text-sm select-none">
+            <input type="checkbox" value="${p.id}" onchange="updateComparison()" class="product-cb rounded border-gray-300 text-brand-600 focus:ring-brand-500">
+            <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${COLORS[i % COLORS.length]}"></span>
+            <span class="font-medium">${p.name}</span>
+            ${best ? `<span class="text-gray-400">${Math.round(best)} Lei</span>` : ''}
+        </label>`;
+    }).join('');
+}
+
+function updateComparison() {
+    const selected = [...document.querySelectorAll('.product-cb:checked')].map(cb => cb.value);
+
+    if (selected.length < 2) {
+        document.getElementById('chart-container').style.display = 'none';
+        document.getElementById('table-container').style.display = 'none';
+        document.getElementById('empty-state').style.display = 'block';
+        if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+        return;
+    }
+
+    document.getElementById('chart-container').style.display = 'block';
+    document.getElementById('table-container').style.display = 'block';
+    document.getElementById('empty-state').style.display = 'none';
+
+    renderChart(selected);
+    renderTable(selected);
+}
+
+function renderChart(selectedIds) {
+    const datasets = [];
+
+    selectedIds.forEach((pid, idx) => {
+        const product = db.products.find(p => p.id === pid);
+        const history = db.price_history.filter(h => h.product_id === pid);
+
+        // Group by 5-min session, take best price
+        const bySession = {};
+        for (const h of history) {
+            const d = new Date(h.checked_at);
+            d.setMinutes(Math.floor(d.getMinutes() / 5) * 5, 0, 0);
+            const key = d.toISOString();
+            if (!bySession[key] || h.price < bySession[key].y) {
+                bySession[key] = { x: key, y: h.price };
+            }
+        }
+        const points = Object.values(bySession).sort((a, b) => a.x.localeCompare(b.x));
+
+        const color = COLORS[idx % COLORS.length];
+        datasets.push({
+            label: product.name,
+            data: points,
+            borderColor: color,
+            backgroundColor: color + '20',
+            borderWidth: 3,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.3,
+            fill: false,
+        });
+    });
+
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(document.getElementById('compareChart'), {
+        type: 'line',
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        displayFormats: { hour: 'MMM d, HH:mm', day: 'MMM d' },
+                        tooltipFormat: 'MMM d, yyyy HH:mm',
+                    },
+                    ticks: { maxTicksLimit: 10 },
+                    grid: { display: false },
+                },
+                y: {
+                    beginAtZero: false,
+                    ticks: { callback: v => v + ' Lei' },
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ctx.dataset.label + ': ' + Math.round(ctx.parsed.y) + ' Lei',
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderTable(selectedIds) {
+    const tbody = document.getElementById('compare-table');
+    tbody.innerHTML = selectedIds.map((pid, idx) => {
+        const product = db.products.find(p => p.id === pid);
+        const history = db.price_history.filter(h => h.product_id === pid);
+        const prices = history.map(h => h.price);
+        const best = prices.length ? Math.min(...prices) : null;
+        const low = prices.length ? Math.min(...prices) : null;
+        const avg = prices.length ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : null;
+        const retailers = [...new Set(product.tracked_urls.map(u => u.retailer))];
+        const color = COLORS[idx % COLORS.length];
+
+        return `
+        <tr class="border-b border-gray-100">
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${color}"></span>
+                    <a href="product.html?id=${pid}" class="font-medium text-gray-900 hover:text-brand-600">${product.name}</a>
+                </div>
+            </td>
+            <td class="px-4 py-3 text-right font-semibold text-brand-600">${best ? Math.round(best) + ' Lei' : '—'}</td>
+            <td class="px-4 py-3 text-right text-emerald-600">${low ? Math.round(low) + ' Lei' : '—'}</td>
+            <td class="px-4 py-3 text-right text-gray-600">${avg ? avg + ' Lei' : '—'}</td>
+            <td class="px-4 py-3 text-right text-xs text-gray-500">${retailers.join(', ')}</td>
+        </tr>`;
+    }).join('');
+}
+
+init();
+</script>
+</body>
+</html>
