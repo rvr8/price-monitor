@@ -40,7 +40,8 @@
           "variant_name": "Carucior Balios S Lux Cybex 2 in 1 TPE, Almond Bei"
         }
       ],
-      "alerts": []
+      "alerts": [],
+      "check_frequency_hours": 6
     },
     {
       "id": "bugaboo-fox-cub-black-stormy-2-in-1",
