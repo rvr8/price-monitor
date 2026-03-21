@@ -127,7 +127,7 @@ async function loadProduct() {
                 ${bestPrice !== null ? `
                 <div class="rounded-lg p-4 mb-4 border ${signalClass}">
                     <div class="font-bold text-lg">${signalText}</div>
-                    <div class="text-sm opacity-80">Current best: ${Math.round(bestPrice)} Lei${allTimeLow !== bestPrice ? ' — lowest was ' + Math.round(allTimeLow) + ' Lei' : ' — this is the lowest we\\'ve seen'}</div>
+                    <div class="text-sm opacity-80">Current best: ${Math.round(bestPrice)} Lei${allTimeLow !== bestPrice ? ' — lowest was ' + Math.round(allTimeLow) + ' Lei' : ' — this is the lowest price recorded'}</div>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div class="bg-gray-50 rounded-lg p-3 text-center">
