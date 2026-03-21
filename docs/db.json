@@ -64,19 +64,6 @@
       "alerts": [],
       "check_frequency_hours": 6,
       "last_checked": "2026-03-21T21:21:41Z"
-    },
-    {
-      "id": "delete-test-product",
-      "name": "DELETE TEST PRODUCT",
-      "image_url": null,
-      "tracked_urls": [
-        {
-          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-          "retailer": "ToysForKids",
-          "variant_name": "Test delete"
-        }
-      ],
-      "alerts": []
     }
   ],
   "price_history": [
@@ -479,14 +466,6 @@
       "original_price": 3748.0,
       "in_stock": true,
       "checked_at": "2026-03-21T21:31:08Z"
-    },
-    {
-      "product_id": "delete-test-product",
-      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
-      "in_stock": true,
-      "checked_at": "2026-03-21T21:33:11Z"
     }
   ],
   "last_checked": "2026-03-21T21:33:12Z",
