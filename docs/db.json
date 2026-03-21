@@ -77,6 +77,19 @@
         }
       ],
       "alerts": []
+    },
+    {
+      "id": "ccv-scrape-test",
+      "name": "CCV Scrape Test",
+      "image_url": null,
+      "tracked_urls": [
+        {
+          "url": "https://www.caruselulcuvise.ro/carucioare-copii/pachet-c%C4%83rucior-pentru-copii-5-%C3%AEn-1-joolz-hub2-navy-blue.html",
+          "retailer": "CaruselulCuVise",
+          "variant_name": "Joolz Hub2 CCV"
+        }
+      ],
+      "alerts": []
     }
   ],
   "price_history": [
@@ -487,8 +500,16 @@
       "original_price": 2575.0,
       "in_stock": true,
       "checked_at": "2026-03-21T21:35:50Z"
+    },
+    {
+      "product_id": "ccv-scrape-test",
+      "url": "https://www.caruselulcuvise.ro/carucioare-copii/pachet-c%C4%83rucior-pentru-copii-5-%C3%AEn-1-joolz-hub2-navy-blue.html",
+      "price": 5177.5,
+      "original_price": 5450.0,
+      "in_stock": false,
+      "checked_at": "2026-03-21T21:35:53Z"
     }
   ],
-  "last_checked": "2026-03-21T21:35:52Z",
+  "last_checked": "2026-03-21T21:35:55Z",
   "archived_products": []
 }
