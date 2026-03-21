@@ -69,6 +69,16 @@
           "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
           "retailer": "ToysForKids",
           "variant_name": "carucior balios s lux cybex sky blue"
+        },
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6891",
+          "retailer": "BabyMatters",
+          "variant_name": "Balios S Lux 2in1 Seashell Beige"
+        },
+        {
+          "url": "https://www.erfi.ro/carucior-cybex-balios-s-lux-taupe-almond-beige-cybex-524001211.html",
+          "retailer": "ErFi",
+          "variant_name": "Balios S Lux Taupe Almond Beige"
         }
       ],
       "alerts": [],
@@ -442,247 +452,247 @@
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:21:41Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:21:41Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:21:41Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:21:41Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T21:21:41Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-tpe-sky-blue.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T21:31:08Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black-ro.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T21:31:08Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black-ro.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T21:31:08Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T21:31:08Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:51:46Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:51:46Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:51:46Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:51:46Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:54:31Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:54:31Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:54:31Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:54:31Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:58:45Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:58:45Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:58:45Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T21:58:45Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:00:23Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:00:23Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:00:23Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:00:23Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:08:25Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:08:25Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:08:25Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:08:25Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:33:56Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T22:33:56Z"
@@ -690,7 +700,7 @@
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T22:33:56Z"
@@ -698,15 +708,15 @@
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T22:45:01Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T22:45:01Z"
@@ -714,7 +724,7 @@
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T22:45:01Z"
@@ -722,55 +732,55 @@
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:00:26Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-tpe-sky-blue.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:00:26Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black-ro.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:00:26Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black-ro.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:00:26Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:00:26Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:01:22Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:01:22Z"
@@ -778,7 +788,7 @@
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:01:22Z"
@@ -786,15 +796,15 @@
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:01:31Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:01:31Z"
@@ -802,7 +812,7 @@
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:01:31Z"
@@ -810,151 +820,151 @@
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:17Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:17Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:17Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:17Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:47Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:47Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:47Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:02:47Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:48Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
-      "price": 2160.0,
-      "original_price": 2498.0,
+      "price": 2160,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:48Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:48Z"
     },
     {
       "product_id": "product-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
-      "price": 2170.0,
-      "original_price": 2498.0,
+      "price": 2170,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:48Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:57Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-tpe-sky-blue.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:57Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black-ro.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:57Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black-ro.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:57Z"
     },
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black.html",
-      "price": 3190.0,
-      "original_price": 3748.0,
+      "price": 3190,
+      "original_price": 3748,
       "in_stock": true,
       "checked_at": "2026-03-21T23:04:57Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
-      "price": 2080.0,
-      "original_price": 2498.0,
+      "price": 2080,
+      "original_price": 2498,
       "in_stock": true,
       "checked_at": "2026-03-21T23:05:06Z"
     },
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:05:06Z"
@@ -962,7 +972,7 @@
     {
       "product_id": "cybex-balios-s-lux",
       "url": "https://babymatters.ro/carucior-3-in-1-balios-s-lux-pentru-copii-cu-landou-si-scoica-auto-cloud-g-plus-seashell-beige-cu-cadru-taupe-6919",
-      "price": 4684.0,
+      "price": 4684,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:05:06Z"
@@ -970,7 +980,7 @@
     {
       "product_id": "balios-s-lux-cybex-2-in-1",
       "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6913",
-      "price": 3277.0,
+      "price": 3277,
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:12:35Z"
