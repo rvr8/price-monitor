@@ -27,7 +27,7 @@
         }
       ],
       "alerts": [],
-      "check_frequency_hours": 12
+      "check_frequency_hours": 6
     },
     {
       "id": "balios-s-lux-cybex-2-in-1",
