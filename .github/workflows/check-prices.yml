@@ -1,0 +1,35 @@
+name: Check Prices
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'  # Every 6 hours at :17 past
+  workflow_dispatch: {}       # Manual trigger button in GitHub UI
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install httpx beautifulsoup4 lxml
+
+      - name: Check prices
+        run: python check_prices.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Commit updated prices
+        run: |
+          git config user.name "Price Bot"
+          git config user.email "bot@price-monitor"
+          git add docs/db.json
+          git diff --cached --quiet || git commit -m "price check $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push
