@@ -43,7 +43,15 @@
 
         <!-- Price Timeline -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Price Timeline</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">Price Timeline</h2>
+                <div class="flex gap-1 bg-gray-100 rounded-lg p-1" id="range-selector">
+                    <button onclick="setRange(7)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">7d</button>
+                    <button onclick="setRange(30)" class="range-btn px-3 py-1 rounded-md text-xs font-medium bg-white text-brand-600 shadow-sm">30d</button>
+                    <button onclick="setRange(90)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">90d</button>
+                    <button onclick="setRange(0)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">All</button>
+                </div>
+            </div>
             <div class="relative" style="height: 320px;">
                 <canvas id="priceChart"></canvas>
             </div>
@@ -165,14 +173,54 @@ async function loadProduct() {
     renderAlerts(product, avg);
 }
 
+let chartInstance = null;
+let chartProduct = null;
+let chartHistory = null;
+let currentRange = 30;
+
+function setRange(days) {
+    currentRange = days;
+    // Update button styles
+    document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.className = 'range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white';
+    });
+    event.currentTarget.className = 'range-btn px-3 py-1 rounded-md text-xs font-medium bg-white text-brand-600 shadow-sm';
+    renderChart(chartProduct, chartHistory);
+}
+
+function aggregateByDay(points) {
+    // Keep only the last price record per day
+    const byDay = {};
+    for (const p of points) {
+        const day = p.x.substring(0, 10); // YYYY-MM-DD
+        byDay[day] = p; // last one wins
+    }
+    return Object.values(byDay).sort((a, b) => a.x.localeCompare(b.x));
+}
+
 function renderChart(product, history) {
+    chartProduct = product;
+    chartHistory = history;
+
     const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
     const datasets = [];
 
+    // Filter by date range
+    let cutoff = null;
+    if (currentRange > 0) {
+        cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - currentRange);
+        cutoff = cutoff.toISOString();
+    }
+
     product.tracked_urls.forEach((tracked, idx) => {
-        const points = history
+        let points = history
             .filter(h => h.url === tracked.url)
+            .filter(h => !cutoff || h.checked_at >= cutoff)
             .map(h => ({ x: h.checked_at, y: h.price }));
+
+        // Aggregate to daily data points
+        points = aggregateByDay(points);
         if (points.length === 0) return;
 
         datasets.push({
@@ -189,7 +237,10 @@ function renderChart(product, history) {
 
     if (datasets.length === 0) return;
 
-    new Chart(document.getElementById('priceChart'), {
+    // Destroy previous chart
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(document.getElementById('priceChart'), {
         type: 'line',
         data: { datasets },
         options: {
@@ -200,15 +251,15 @@ function renderChart(product, history) {
                 x: {
                     type: 'time',
                     time: {
+                        unit: 'day',
                         displayFormats: {
-                            hour: 'MMM d, HH:mm',
                             day: 'MMM d',
                             week: 'MMM d',
                             month: 'MMM yyyy',
                         },
-                        tooltipFormat: 'MMM d, yyyy HH:mm',
+                        tooltipFormat: 'MMM d, yyyy',
                     },
-                    ticks: { maxTicksLimit: 10 },
+                    ticks: { maxTicksLimit: 12 },
                     grid: { display: false },
                 },
                 y: {
