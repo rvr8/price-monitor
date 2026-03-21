@@ -379,15 +379,15 @@ function renderChart(product, history) {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'day',
                         displayFormats: {
+                            hour: 'MMM d, HH:mm',
                             day: 'MMM d',
                             week: 'MMM d',
                             month: 'MMM yyyy',
                         },
-                        tooltipFormat: 'MMM d, yyyy',
+                        tooltipFormat: 'MMM d, yyyy HH:mm',
                     },
-                    ticks: { maxTicksLimit: 12 },
+                    ticks: { maxTicksLimit: 10, maxRotation: 45 },
                     grid: { display: false },
                 },
                 y: {
