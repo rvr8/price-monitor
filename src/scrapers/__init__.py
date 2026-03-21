@@ -25,6 +25,8 @@ SEARCHABLE_SCRAPERS = [
     BabyNeedsScraper,
     ToysForKidsScraper,
     BabyMattersScraper,
+    ErFiScraper,
+    CaruselulCuViseScraper,
 ]
 
 

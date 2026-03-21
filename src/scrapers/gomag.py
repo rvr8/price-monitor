@@ -1,7 +1,7 @@
 """GoMag platform scraper — works for ErFi.ro, CaruselulCuVise.ro, and other GoMag stores.
 
-GoMag embeds product JSON in the page HTML. Search results use Releva (JS-only),
-so search() is not supported — only scrape() for individual product pages."""
+GoMag embeds product JSON in page HTML. Search results pages also contain product
+URLs and embedded JSON, even though visible content is JS-rendered via Releva."""
 
 import json
 import re
@@ -16,13 +16,80 @@ class GoMagScraper(BaseScraper):
     """Base scraper for GoMag-powered stores. Subclass to set RETAILER_NAME."""
 
     RETAILER_NAME = "GoMag"
+    SEARCH_URL = ""  # Override in subclass: e.g. "https://www.erfi.ro/catalogsearch/result?q={query}"
 
     # Pattern to find start of GoMag product JSON objects
     _PRODUCT_START_RE = re.compile(r'\{"id":["\d]')
 
     def search(self, query: str, max_results: int = 10) -> list[SearchResult]:
-        """GoMag stores use Releva for search (JS-rendered). Not supported via HTML scraping."""
-        return []
+        """Search GoMag store: fetch search page, extract product URLs,
+        filter by query words in URL slug, scrape matching pages for data."""
+        if not self.SEARCH_URL:
+            return []
+
+        url = self.SEARCH_URL.format(query=query.replace(" ", "+"))
+        try:
+            html = self.fetch(url)
+        except Exception:
+            return []
+
+        soup = BeautifulSoup(html, "lxml")
+
+        # Extract product URLs from the page
+        base_domain = self.SEARCH_URL.split("/catalogsearch")[0]
+        seen = set()
+        product_urls = []
+        for a in soup.find_all("a", href=True):
+            href = a["href"]
+            if (href.startswith(base_domain) and href.endswith(".html")
+                    and "catalogsearch" not in href and "customer" not in href
+                    and "checkout" not in href and href not in seen):
+                seen.add(href)
+                product_urls.append(href)
+
+        # Filter URLs by query words in the slug
+        query_words = [w.lower() for w in query.split() if len(w) > 2]
+        matching_urls = []
+        for purl in product_urls:
+            slug = purl.split("/")[-1].lower()
+            matches = sum(1 for w in query_words if w in slug)
+            if matches >= max(2, len(query_words) // 2):
+                matching_urls.append(purl)
+
+        # Scrape only matching URLs (max 5 to stay within timeout)
+        results = []
+        for product_url in matching_urls[:min(max_results, 5)]:
+            try:
+                page_html = self.fetch(product_url)
+                product_data = self._extract_gomag_json(page_html, product_url)
+                if not product_data or not product_data.get("name") or not product_data.get("price"):
+                    continue
+
+                price = float(product_data["price"])
+                original_price = None
+                try:
+                    base = float(product_data.get("basePrice", 0))
+                    if base > price:
+                        original_price = base
+                except (ValueError, TypeError):
+                    pass
+
+                image = product_data.get("image", "").replace("\\/", "/")
+                in_stock = product_data.get("stockStatus", "") in ("instock", "order")
+
+                results.append(SearchResult(
+                    name=product_data["name"].replace("\\/", "/"),
+                    url=product_data.get("url", product_url).replace("\\/", "/"),
+                    retailer=self.RETAILER_NAME,
+                    price=price,
+                    original_price=original_price,
+                    in_stock=in_stock,
+                    image_url=image if image else None,
+                ))
+            except Exception:
+                continue
+
+        return results
 
     def scrape(self, url: str) -> ScrapeResult:
         """Scrape a GoMag product page by extracting the embedded JSON."""
@@ -150,7 +217,9 @@ class GoMagScraper(BaseScraper):
 
 class ErFiScraper(GoMagScraper):
     RETAILER_NAME = "ErFi"
+    SEARCH_URL = "https://www.erfi.ro/catalogsearch/result?q={query}"
 
 
 class CaruselulCuViseScraper(GoMagScraper):
     RETAILER_NAME = "CaruselulCuVise"
+    SEARCH_URL = "https://www.caruselulcuvise.ro/catalogsearch/result?q={query}"

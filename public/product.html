@@ -41,19 +41,49 @@
         <!-- Product header -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6" id="product-header"></div>
 
-        <!-- Price Timeline -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-900">Price Timeline</h2>
-                <div class="flex gap-1 bg-gray-100 rounded-lg p-1" id="range-selector">
-                    <button onclick="setRange(7)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">7d</button>
-                    <button onclick="setRange(30)" class="range-btn px-3 py-1 rounded-md text-xs font-medium bg-white text-brand-600 shadow-sm">30d</button>
-                    <button onclick="setRange(90)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">90d</button>
-                    <button onclick="setRange(0)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">All</button>
+        <!-- Price Timeline + Stats -->
+        <div class="flex flex-col lg:flex-row gap-4 mb-6">
+            <div class="bg-white rounded-xl border border-gray-200 p-6 flex-1 min-w-0">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Price Timeline</h2>
+                    <div class="flex gap-1 bg-gray-100 rounded-lg p-1" id="range-selector">
+                        <button onclick="setRange(7)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">7d</button>
+                        <button onclick="setRange(30)" class="range-btn px-3 py-1 rounded-md text-xs font-medium bg-white text-brand-600 shadow-sm">30d</button>
+                        <button onclick="setRange(90)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">90d</button>
+                        <button onclick="setRange(0)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">All</button>
+                    </div>
+                </div>
+                <div class="relative" style="height: 320px;">
+                    <canvas id="priceChart"></canvas>
                 </div>
             </div>
-            <div class="relative" style="height: 320px;">
-                <canvas id="priceChart"></canvas>
+            <div class="bg-white rounded-xl border border-gray-200 p-6 lg:w-48 flex-shrink-0" id="price-stats-panel">
+                <h3 class="text-sm font-semibold text-gray-900 mb-4">Price Stats</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Lowest</div>
+                        <div class="text-xl font-bold text-emerald-600" id="stat-min">—</div>
+                        <div class="text-[10px] text-gray-400">Lei</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Highest</div>
+                        <div class="text-xl font-bold text-red-500" id="stat-max">—</div>
+                        <div class="text-[10px] text-gray-400">Lei</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Average</div>
+                        <div class="text-xl font-bold text-gray-700" id="stat-avg">—</div>
+                        <div class="text-[10px] text-gray-400">Lei</div>
+                    </div>
+                    <div class="pt-3 border-t border-gray-100">
+                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Check Freq</div>
+                        <div class="text-xl font-bold text-brand-600" id="stat-freq">—</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Checks</div>
+                        <div class="text-xl font-bold text-gray-700" id="stat-checks">—</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -232,6 +262,19 @@ async function loadProduct() {
 
     // Set frequency selector to current value
     initFrequency(product);
+
+    // Populate stats panel
+    const allPrices = history.map(h => h.price);
+    const uniqueChecks = new Set(history.map(h => {
+        const d = new Date(h.checked_at);
+        d.setMinutes(Math.floor(d.getMinutes() / 5) * 5, 0, 0);
+        return d.toISOString();
+    }));
+    document.getElementById('stat-min').textContent = allPrices.length ? Math.round(Math.min(...allPrices)) : '—';
+    document.getElementById('stat-max').textContent = allPrices.length ? Math.round(Math.max(...allPrices)) : '—';
+    document.getElementById('stat-avg').textContent = avg || '—';
+    document.getElementById('stat-freq').textContent = (product.check_frequency_hours || 12) + 'h';
+    document.getElementById('stat-checks').textContent = uniqueChecks.size;
 }
 
 let chartInstance = null;
@@ -292,15 +335,18 @@ function renderChart(product, history) {
             .filter(h => retailerUrls.includes(h.url))
             .filter(h => !cutoff || h.checked_at >= cutoff);
 
-        // Per check timestamp, take the BEST (lowest) price across all variants for this retailer
-        const byTimestamp = {};
+        // Per check session, take the BEST (lowest) price across all variants
+        // Round to nearest 5 minutes to group URLs checked in the same session
+        const bySession = {};
         for (const h of retailerHistory) {
-            const ts = h.checked_at;
-            if (!byTimestamp[ts] || h.price < byTimestamp[ts].price) {
-                byTimestamp[ts] = { x: ts, y: h.price };
+            const d = new Date(h.checked_at);
+            d.setMinutes(Math.floor(d.getMinutes() / 5) * 5, 0, 0);
+            const sessionKey = d.toISOString();
+            if (!bySession[sessionKey] || h.price < bySession[sessionKey].price) {
+                bySession[sessionKey] = { x: sessionKey, y: h.price };
             }
         }
-        const points = Object.values(byTimestamp).sort((a, b) => a.x.localeCompare(b.x));
+        const points = Object.values(bySession).sort((a, b) => a.x.localeCompare(b.x));
         if (points.length === 0) return;
 
         const color = retailerColors[retailer] || defaultColors[idx % defaultColors.length];
