@@ -67,7 +67,8 @@
         }
       ],
       "alerts": [],
-      "last_checked": "2026-03-21T21:53:05Z"
+      "last_checked": "2026-03-21T21:53:05Z",
+      "check_frequency_hours": 1
     },
     {
       "id": "product-1",
