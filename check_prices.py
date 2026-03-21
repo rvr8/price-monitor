@@ -25,13 +25,35 @@ def save_db(db):
         json.dump(db, f, indent=2, ensure_ascii=False)
 
 
+def _is_due(product, now_dt):
+    """Check if a product is due for a price check based on its frequency."""
+    freq_hours = product.get("check_frequency_hours", 12)
+    last_checked = product.get("last_checked")
+    if not last_checked:
+        return True  # Never checked individually — always due
+    try:
+        last_dt = datetime.fromisoformat(last_checked.replace("Z", "+00:00"))
+        elapsed = (now_dt - last_dt).total_seconds() / 3600
+        return elapsed >= freq_hours
+    except (ValueError, TypeError):
+        return True  # Invalid timestamp — check anyway
+
+
 def check_all(db):
-    """Scrape all tracked URLs and append price records."""
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    """Scrape tracked URLs for products that are due, respecting per-product frequency."""
+    now_dt = datetime.now(timezone.utc)
+    now = now_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
     checked = 0
     errors = 0
+    skipped = 0
 
     for product in db["products"]:
+        if not _is_due(product, now_dt):
+            freq = product.get("check_frequency_hours", 12)
+            print(f"  SKIP: {product['name']} (freq={freq}h, last={product.get('last_checked', 'never')})")
+            skipped += 1
+            continue
+
         for tracked in product["tracked_urls"]:
             url = tracked["url"]
             try:
@@ -55,7 +77,11 @@ def check_all(db):
                 errors += 1
                 print(f"  ERR: {url} — {e}")
 
+        # Mark this product as checked
+        product["last_checked"] = now
+
     db["last_checked"] = now
+    print(f"  Skipped {skipped} products (not yet due)")
     return checked, errors
 
 

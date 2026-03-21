@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retailers — Price Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { brand: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' }}}}
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 via-white to-blue-50 min-h-screen flex flex-col">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-brand-600 font-bold text-xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                Price Monitor
+            </a>
+            <div class="flex items-center gap-4 text-sm">
+                <a href="index.html" class="text-gray-500 hover:text-brand-600">Dashboard</a>
+                <span class="text-brand-600 font-medium">Retailers</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Retailers</h1>
+                <p class="text-sm text-gray-500 mt-1">Supported stores and their scraping status</p>
+            </div>
+            <button onclick="checkAll()" id="check-btn"
+                class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 flex items-center gap-2 self-start">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Check Status
+            </button>
+        </div>
+
+        <!-- Desktop: table, Mobile: cards -->
+        <div class="hidden sm:block bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="text-left px-4 py-3 font-semibold text-gray-700">Retailer</th>
+                        <th class="text-left px-4 py-3 font-semibold text-gray-700">Website</th>
+                        <th class="text-left px-4 py-3 font-semibold text-gray-700 hidden lg:table-cell">Scraping Mechanism</th>
+                        <th class="text-left px-4 py-3 font-semibold text-gray-700">Search</th>
+                        <th class="text-left px-4 py-3 font-semibold text-gray-700">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="retailers-table-desktop"></tbody>
+            </table>
+        </div>
+        <div class="sm:hidden space-y-3" id="retailers-cards-mobile">
+            <div class="text-center text-gray-400 py-8">Loading retailers...</div>
+        </div>
+
+        <div class="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-3">Legend</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Search
+                    </span>
+                    Supports product search — results appear in "Add Product"
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Scrape only
+                    </span>
+                    Price tracking only — add product URLs manually
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-50 text-gray-500 border border-gray-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Blocked
+                    </span>
+                    Site blocks scraping — not functional
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center text-gray-400 text-sm">
+            Price Monitor — Tracking prices across Romanian retailers
+        </div>
+    </footer>
+
+<script>
+let retailersData = [];
+
+async function loadRetailers() {
+    try {
+        const resp = await fetch('/api/retailers');
+        const data = await resp.json();
+        retailersData = data.retailers || [];
+        renderTable(retailersData);
+    } catch (e) {
+        document.getElementById('retailers-table-desktop').innerHTML =
+            '<tr><td colspan="5" class="px-4 py-8 text-center text-red-500">Failed to load retailers</td></tr>';
+        document.getElementById('retailers-cards-mobile').innerHTML =
+            '<div class="text-center text-red-500 py-8">Failed to load retailers</div>';
+    }
+}
+
+async function checkAll() {
+    const btn = document.getElementById('check-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div> Checking...';
+
+    try {
+        const resp = await fetch('/api/retailers?check=true');
+        const data = await resp.json();
+        retailersData = data.retailers || [];
+        renderTable(retailersData);
+    } catch (e) {
+        console.error(e);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Check Status';
+}
+
+function getBadge(r) {
+    const isBlocked = r.mechanism.toLowerCase().includes('blocked');
+    return isBlocked
+        ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-50 text-gray-500 border border-gray-200"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Blocked</span>'
+        : r.supports_search
+            ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Search</span>'
+            : '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700 border border-blue-200"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Scrape only</span>';
+}
+
+function getStatus(r) {
+    if (!r.health) return '<span class="text-gray-400">—</span>';
+    if (r.health.status === 'ok')
+        return '<span class="inline-flex items-center gap-1 text-xs text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> OK <span class="text-gray-400">(' + r.health.response_ms + 'ms)</span></span>';
+    return '<span class="inline-flex items-center gap-1 text-xs text-red-600"><span class="w-2 h-2 rounded-full bg-red-500"></span> Error</span>';
+}
+
+function renderTable(retailers) {
+    // Desktop table
+    const tbody = document.getElementById('retailers-table-desktop');
+    tbody.innerHTML = retailers.map(r => `
+        <tr class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${r.color}"></div>
+                    <span class="font-medium text-gray-900">${r.name}</span>
+                </div>
+            </td>
+            <td class="px-4 py-3">
+                <a href="${r.url}" target="_blank" class="text-brand-500 hover:underline text-xs">${r.url.replace('https://','').replace('www.','')}</a>
+            </td>
+            <td class="px-4 py-3 hidden lg:table-cell text-xs text-gray-500">${r.mechanism}</td>
+            <td class="px-4 py-3">${getBadge(r)}</td>
+            <td class="px-4 py-3">${getStatus(r)}</td>
+        </tr>`).join('');
+
+    // Mobile cards
+    const cards = document.getElementById('retailers-cards-mobile');
+    cards.innerHTML = retailers.map(r => `
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${r.color}"></div>
+                    <span class="font-semibold text-gray-900">${r.name}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    ${getBadge(r)}
+                    ${getStatus(r)}
+                </div>
+            </div>
+            <a href="${r.url}" target="_blank" class="text-brand-500 hover:underline text-xs">${r.url.replace('https://','').replace('www.','')}</a>
+            <p class="text-xs text-gray-400 mt-1">${r.mechanism}</p>
+        </div>`).join('');
+}
+
+loadRetailers();
+</script>
+</body>
+</html>

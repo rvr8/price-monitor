@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Nav -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center gap-2 text-xl font-bold text-brand-600">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    Price Monitor
+                </a>
+                <div class="flex items-center gap-4">
+                    <a href="retailers.html" class="text-sm text-gray-500 hover:text-brand-600">Retailers</a>
+                    <a href="archive.html" class="text-sm text-gray-500 hover:text-brand-600">Archive</a>
+                    <span id="last-checked" class="text-xs text-gray-400"></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Tracked Products</h1>
+                <p class="text-gray-500 mt-1" id="product-count"></p>
+            </div>
+            <button onclick="toggleAddPanel()" id="add-btn" class="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition font-medium text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Product
+            </button>
+        </div>
+
+        <!-- Add Product Panel -->
+        <div id="add-panel" class="hidden mb-8 bg-white rounded-xl border border-brand-200 p-6 shadow-sm">
+            <!-- Search -->
+            <div id="search-box">
+                <p class="text-sm text-gray-600 mb-3">Search across all Romanian retailers. Type a product name:</p>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="search-input" placeholder="e.g. Cybex Eezy S Twist, Bugaboo Fox, Joie Litetrax..."
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+                        onkeydown="if(event.key==='Enter')searchProducts()">
+                    <button onclick="searchProducts()" id="search-btn" class="bg-brand-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-brand-700 whitespace-nowrap">
+                        Search
+                    </button>
+                </div>
+                <div id="search-status" class="hidden"></div>
+
+                <!-- Search Results -->
+                <div id="search-results" class="hidden space-y-3 mt-4"></div>
+            </div>
+        </div>
+
+        <div id="products-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- Filled by JS -->
+        </div>
+
+        <div id="empty-state" class="text-center py-20 hidden">
+            <h2 class="text-xl font-semibold text-gray-600 mb-2">No products tracked yet</h2>
+            <p class="text-gray-400">Click "Add Product" to search and start tracking.</p>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center text-gray-400 text-sm">
+            Price Monitor — Tracking prices across Romanian retailers
+        </div>
+    </footer>
+
+<script>
+// Primary: GitHub API (no CDN cache, always fresh). Fallback: Vercel static copy.
+const DB_URL_PRIMARY = 'https://api.github.com/repos/rvr8/price-monitor/contents/docs/db.json';
+const DB_URL_FALLBACK = '/db.json';
+
+async function fetchDb() {
+    try {
+        const resp = await fetch(DB_URL_PRIMARY, {
+            headers: { 'Accept': 'application/vnd.github.v3.raw' }
+        });
+        if (resp.ok) return resp.json();
+    } catch {}
+    const resp = await fetch(DB_URL_FALLBACK + '?t=' + Date.now());
+    return resp.json();
+}
+
+// ─── Dashboard ───────────────────────────────────────────────────────────────
+
+async function loadDashboard() {
+    try {
+        const db = await fetchDb();
+
+        document.getElementById('last-checked').textContent = db.last_checked
+            ? 'Last checked: ' + new Date(db.last_checked).toLocaleString()
+            : '';
+
+        const products = db.products || [];
+        document.getElementById('product-count').textContent =
+            products.length + ' product' + (products.length !== 1 ? 's' : '') + ' monitored';
+
+        if (products.length === 0) {
+            document.getElementById('empty-state').classList.remove('hidden');
+            return;
+        }
+
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = '';
+
+        for (const product of products) {
+            const history = db.price_history.filter(h => h.product_id === product.id);
+
+            // Get latest price per URL
+            const latestByUrl = {};
+            for (const h of history) {
+                latestByUrl[h.url] = h;
+            }
+            const latestPrices = Object.values(latestByUrl);
+            const bestPrice = latestPrices.length ? Math.min(...latestPrices.map(p => p.price)) : null;
+            const bestRetailer = latestPrices.find(p => p.price === bestPrice);
+            const allPrices = history.map(h => h.price);
+            const allTimeLow = allPrices.length ? Math.min(...allPrices) : null;
+            const avg = allPrices.length ? Math.round(allPrices.reduce((a, b) => a + b, 0) / allPrices.length) : null;
+            const inStock = latestPrices.filter(p => p.in_stock).length;
+
+            // Buy signal
+            let signal = '', signalColor = '';
+            if (bestPrice !== null && allTimeLow !== null) {
+                if (bestPrice <= allTimeLow) { signal = 'Best price ever'; signalColor = 'text-emerald-600 bg-emerald-50'; }
+                else if (bestPrice <= avg) { signal = 'Below average'; signalColor = 'text-blue-600 bg-blue-50'; }
+                else { signal = 'Above average'; signalColor = 'text-amber-600 bg-amber-50'; }
+            }
+
+            // Retailer badges
+            const badges = latestPrices.map(p => {
+                const r = product.tracked_urls.find(u => u.url === p.url);
+                const retailer = r ? r.retailer : '?';
+                const stockClass = p.in_stock
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-red-50 text-red-600 border-red-200';
+                const dot = p.in_stock
+                    ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>'
+                    : '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>';
+                return `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${stockClass}">${dot} ${retailer} — ${Math.round(p.price)} Lei</span>`;
+            }).join('');
+
+            const uniqueRetailers = [...new Set(product.tracked_urls.map(u => u.retailer))];
+
+            const card = document.createElement('a');
+            card.href = 'product.html?id=' + encodeURIComponent(product.id);
+            card.className = 'bg-white rounded-xl border border-gray-200 hover:border-brand-300 hover:shadow-lg transition-all duration-200 overflow-hidden group';
+            card.innerHTML = `
+                ${product.image_url
+                    ? `<div class="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                        <img src="${product.image_url}" alt="${product.name}" class="max-h-full max-w-full object-contain p-4 group-hover:scale-105 transition-transform duration-200">
+                       </div>`
+                    : `<div class="h-48 bg-gradient-to-br from-brand-50 to-brand-100 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-brand-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                       </div>`}
+                <div class="p-5">
+                    <h3 class="font-semibold text-gray-900 text-lg mb-3 line-clamp-2 group-hover:text-brand-600 transition">${product.name}</h3>
+                    ${bestPrice !== null ? `
+                    <div class="flex items-end justify-between mb-3">
+                        <div>
+                            <div class="text-sm text-gray-500 mb-0.5">Best price</div>
+                            <div class="text-2xl font-bold text-brand-600">${Math.round(bestPrice)} <span class="text-base font-normal text-gray-400">Lei</span></div>
+                        </div>
+                        ${signal ? `<span class="text-xs font-medium px-2 py-1 rounded-full ${signalColor}">${signal}</span>` : ''}
+                    </div>` : '<div class="text-gray-400 mb-3">No price data yet</div>'}
+                    <div class="flex flex-wrap gap-1.5">${badges}</div>
+                    <div class="mt-3 text-xs text-gray-400">${product.tracked_urls.length} variant${product.tracked_urls.length !== 1 ? 's' : ''} across ${uniqueRetailers.length} retailer${uniqueRetailers.length !== 1 ? 's' : ''}</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+    } catch (e) {
+        console.error('Failed to load data:', e);
+        document.getElementById('empty-state').classList.remove('hidden');
+        document.getElementById('empty-state').querySelector('h2').textContent = 'Failed to load data';
+    }
+}
+
+loadDashboard();
+
+// ─── Add Product ─────────────────────────────────────────────────────────────
+
+let lastSearchResults = null;
+
+function toggleAddPanel() {
+    const panel = document.getElementById('add-panel');
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+        document.getElementById('search-input').focus();
+    }
+}
+
+function showStatus(html, type) {
+    const el = document.getElementById('search-status');
+    el.classList.remove('hidden');
+    const colors = {
+        info: 'bg-blue-50 border-blue-200 text-blue-700',
+        error: 'bg-red-50 border-red-200 text-red-700',
+        success: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+    };
+    el.className = `rounded-lg border p-4 text-sm ${colors[type] || colors.info}`;
+    el.innerHTML = html;
+}
+
+function hideStatus() {
+    document.getElementById('search-status').classList.add('hidden');
+}
+
+async function searchProducts() {
+    const query = document.getElementById('search-input').value.trim();
+    if (!query || query.length < 2) return;
+
+    const btn = document.getElementById('search-btn');
+    btn.disabled = true;
+    btn.textContent = 'Searching...';
+    document.getElementById('search-results').classList.add('hidden');
+
+    showStatus(`
+        <div class="flex items-center gap-3">
+            <div class="animate-spin w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
+            <div>
+                <div class="font-medium">Searching all retailers for "${query}"...</div>
+                <div class="text-xs opacity-75 mt-1">Checking ToysForKids, BabyNeeds and more. Takes 5-15 seconds.</div>
+            </div>
+        </div>
+    `, 'info');
+
+    try {
+        const resp = await fetch('/api/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            showStatus('Search failed: ' + (data.error || resp.status), 'error');
+            return;
+        }
+
+        lastSearchResults = data.groups;
+
+        if (!data.groups || data.groups.length === 0) {
+            showStatus('No products found. Try a different name.', 'error');
+            return;
+        }
+
+        hideStatus();
+        renderSearchResults(data.groups);
+
+    } catch (e) {
+        showStatus('Error: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Search';
+    }
+}
+
+function renderSearchResults(groups) {
+    const container = document.getElementById('search-results');
+    container.classList.remove('hidden');
+
+    const retailerDots = {
+        'ToysForKids': '#3b82f6',
+        'BabyNeeds': '#10b981',
+        'eMAG': '#f59e0b',
+    };
+
+    container.innerHTML = `
+        <div class="text-sm font-medium text-gray-700 mb-2">Found ${groups.length} product group${groups.length !== 1 ? 's' : ''}. Click "Track" to start monitoring:</div>
+        ${groups.map((g, i) => `
+            <div class="rounded-lg border border-gray-200 bg-gray-50 overflow-hidden hover:border-brand-300 transition">
+                <div class="flex items-center gap-4 p-4">
+                    ${g.best_image
+                        ? `<div class="w-16 h-16 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-100">
+                            <img src="${g.best_image}" alt="" class="max-h-full max-w-full object-contain p-1">
+                           </div>`
+                        : `<div class="w-16 h-16 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-100">
+                            <svg class="w-8 h-8 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                           </div>`}
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-gray-900">${g.normalized_name}</div>
+                        <div class="text-sm text-gray-500 mt-1">
+                            ${g.count} variant${g.count !== 1 ? 's' : ''}
+                            ${g.best_price ? ` — ${Math.round(g.best_price)}${g.max_price && g.max_price !== g.best_price ? '–' + Math.round(g.max_price) : ''} Lei` : ''}
+                            — ${g.in_stock_count} in stock
+                        </div>
+                        <div class="flex flex-wrap gap-1 mt-2">
+                            ${g.retailers.map(r => `
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-white border border-gray-200">
+                                    <span class="w-1.5 h-1.5 rounded-full" style="background:${retailerDots[r] || '#6b7280'}"></span>
+                                    ${r}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <button onclick="trackGroup(${i})" id="track-btn-${i}"
+                        class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 whitespace-nowrap flex-shrink-0">
+                        Track
+                    </button>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+async function trackGroup(index) {
+    const group = lastSearchResults[index];
+    if (!group) return;
+
+    const btn = document.getElementById('track-btn-' + index);
+    btn.disabled = true;
+    btn.textContent = 'Tracking...';
+
+    showStatus(`
+        <div class="flex items-center gap-3">
+            <div class="animate-spin w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
+            <div>
+                <div class="font-medium">Adding "${group.normalized_name}" to your tracked products...</div>
+                <div class="text-xs opacity-75 mt-1">Fetching initial prices and saving. Takes a few seconds.</div>
+            </div>
+        </div>
+    `, 'info');
+
+    try {
+        const resp = await fetch('/api/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: group.normalized_name,
+                image_url: group.best_image,
+                items: group.items,
+            }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            showStatus('Failed to track: ' + (data.error || resp.status), 'error');
+            btn.disabled = false;
+            btn.textContent = 'Track';
+            return;
+        }
+
+        if (data.status === 'already_tracked') {
+            showStatus(`"${group.normalized_name}" is already tracked. <a href="product.html?id=${data.product_id}" class="underline font-medium">View product</a>`, 'info');
+            btn.textContent = 'Already tracked';
+            return;
+        }
+
+        showStatus(`
+            <div class="font-medium">Added "${group.normalized_name}" with ${data.urls_added} variants!</div>
+            <div class="text-xs mt-1">${data.prices_found} initial prices fetched. Refreshing dashboard...</div>
+        `, 'success');
+
+        // Reload after short delay — fetchDb() always uses GitHub raw, so data is fresh
+        setTimeout(() => location.reload(), 3000);
+
+    } catch (e) {
+        showStatus('Error: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Track';
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cp docs/db.json public/db.json 2>/dev/null || true",
+  "outputDirectory": "public",
+  "framework": null,
+  "functions": {
+    "api/*.py": {
+      "maxDuration": 60,
+      "includeFiles": "../src/**"
+    }
+  }
+}

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product — Price Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: {
+                brand: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+            }}}
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center gap-2 text-xl font-bold text-brand-600">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    Price Monitor
+                </a>
+                <span id="last-checked" class="text-xs text-gray-400"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full">
+        <!-- Breadcrumb -->
+        <nav class="mb-6 text-sm">
+            <a href="index.html" class="text-gray-400 hover:text-brand-600 transition">Dashboard</a>
+            <span class="text-gray-300 mx-2">/</span>
+            <span class="text-gray-600" id="breadcrumb-name"></span>
+        </nav>
+
+        <!-- Product header -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6" id="product-header"></div>
+
+        <!-- Price Timeline -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">Price Timeline</h2>
+                <div class="flex gap-1 bg-gray-100 rounded-lg p-1" id="range-selector">
+                    <button onclick="setRange(7)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">7d</button>
+                    <button onclick="setRange(30)" class="range-btn px-3 py-1 rounded-md text-xs font-medium bg-white text-brand-600 shadow-sm">30d</button>
+                    <button onclick="setRange(90)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">90d</button>
+                    <button onclick="setRange(0)" class="range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white">All</button>
+                </div>
+            </div>
+            <div class="relative" style="height: 320px;">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Where to Buy -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6" id="where-to-buy">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Where to Buy</h2>
+            <div id="buy-list" class="space-y-2"></div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6" id="alerts-section">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Price Alerts</h2>
+            <div id="alerts-list"></div>
+        </div>
+
+        <!-- Settings -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6" id="settings-section">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Settings</h2>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <label class="text-sm text-gray-600 whitespace-nowrap">Check frequency:</label>
+                <div class="flex gap-1 bg-gray-100 rounded-lg p-1" id="freq-selector">
+                    <button onclick="setFrequency(6)" data-freq="6"
+                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
+                        Every 6h
+                    </button>
+                    <button onclick="setFrequency(12)" data-freq="12"
+                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium bg-white text-brand-600 shadow-sm transition">
+                        Every 12h
+                    </button>
+                    <button onclick="setFrequency(24)" data-freq="24"
+                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
+                        Every 24h
+                    </button>
+                </div>
+                <span id="freq-status" class="text-xs text-gray-400"></span>
+            </div>
+            <div class="border-t border-gray-100 mt-4 pt-4 flex flex-col sm:flex-row gap-2">
+                <button onclick="archiveProduct()" id="archive-btn"
+                    class="px-4 py-2 rounded-lg text-sm font-medium border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition">
+                    Archive Product
+                </button>
+                <button onclick="deleteProduct()" id="delete-btn"
+                    class="px-4 py-2 rounded-lg text-sm font-medium border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition">
+                    Delete Product
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center text-gray-400 text-sm">
+            Price Monitor — Tracking prices across Romanian retailers
+        </div>
+    </footer>
+
+<script>
+// Primary: GitHub API (no CDN cache, always fresh). Fallback: Vercel static copy.
+const DB_URL_PRIMARY = 'https://api.github.com/repos/rvr8/price-monitor/contents/docs/db.json';
+const DB_URL_FALLBACK = '/db.json';
+
+async function fetchDb() {
+    try {
+        const resp = await fetch(DB_URL_PRIMARY, {
+            headers: { 'Accept': 'application/vnd.github.v3.raw' }
+        });
+        if (resp.ok) return resp.json();
+    } catch {}
+    const resp = await fetch(DB_URL_FALLBACK + '?t=' + Date.now());
+    return resp.json();
+}
+
+const params = new URLSearchParams(window.location.search);
+const productId = params.get('id');
+
+async function loadProduct() {
+    if (!productId) { window.location.href = 'index.html'; return; }
+
+    const db = await fetchDb();
+
+    const product = db.products.find(p => p.id === productId);
+    if (!product) { window.location.href = 'index.html'; return; }
+
+    document.title = product.name + ' — Price Monitor';
+    document.getElementById('breadcrumb-name').textContent = product.name;
+    document.getElementById('last-checked').textContent = db.last_checked
+        ? 'Last checked: ' + new Date(db.last_checked).toLocaleString() : '';
+
+    // All price history for this product
+    const history = db.price_history.filter(h => h.product_id === product.id);
+    const allPrices = history.map(h => h.price);
+
+    // Latest price per URL
+    const latestByUrl = {};
+    for (const h of history) { latestByUrl[h.url] = h; }
+    const latestPrices = Object.values(latestByUrl);
+    const bestPrice = latestPrices.length ? Math.min(...latestPrices.map(p => p.price)) : null;
+    const allTimeLow = allPrices.length ? Math.min(...allPrices) : null;
+    const allTimeHigh = allPrices.length ? Math.max(...allPrices) : null;
+    const avg = allPrices.length ? Math.round(allPrices.reduce((a, b) => a + b, 0) / allPrices.length) : null;
+    const inStock = latestPrices.filter(p => p.in_stock).length;
+    const totalVariants = product.tracked_urls.length;
+
+    // Buy signal
+    let signalText = '', signalClass = '';
+    if (bestPrice <= allTimeLow) {
+        signalText = 'Best price ever — buy now!';
+        signalClass = 'bg-emerald-50 border-emerald-200 text-emerald-700';
+    } else if (bestPrice <= avg) {
+        signalText = 'Below average price — good deal';
+        signalClass = 'bg-blue-50 border-blue-200 text-blue-700';
+    } else {
+        signalText = 'Above average — consider waiting';
+        signalClass = 'bg-amber-50 border-amber-200 text-amber-700';
+    }
+
+    // Render header
+    document.getElementById('product-header').innerHTML = `
+        <div class="flex flex-col sm:flex-row gap-6">
+            ${product.image_url ? `
+            <div class="w-full sm:w-48 h-48 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                <img src="${product.image_url}" alt="${product.name}" class="max-h-full max-w-full object-contain p-2">
+            </div>` : ''}
+            <div class="flex-1">
+                <h1 class="text-2xl font-bold text-gray-900 mb-3">${product.name}</h1>
+                ${bestPrice !== null ? `
+                <div class="rounded-lg p-4 mb-4 border ${signalClass}">
+                    <div class="font-bold text-lg">${signalText}</div>
+                    <div class="text-sm opacity-80">Current best: ${Math.round(bestPrice)} Lei${allTimeLow !== bestPrice ? ' — lowest was ' + Math.round(allTimeLow) + ' Lei' : ' — this is the lowest price recorded'}</div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-gray-50 rounded-lg p-3 text-center">
+                        <div class="text-xs text-gray-500 mb-1">Best Now</div>
+                        <div class="text-xl font-bold text-brand-600">${Math.round(bestPrice)}</div>
+                        <div class="text-xs text-gray-400">Lei</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 text-center">
+                        <div class="text-xs text-gray-500 mb-1">All-Time Low</div>
+                        <div class="text-xl font-bold text-emerald-600">${Math.round(allTimeLow)}</div>
+                        <div class="text-xs text-gray-400">Lei</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 text-center">
+                        <div class="text-xs text-gray-500 mb-1">Average</div>
+                        <div class="text-xl font-bold text-gray-600">${avg}</div>
+                        <div class="text-xs text-gray-400">Lei</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 text-center">
+                        <div class="text-xs text-gray-500 mb-1">Availability</div>
+                        <div class="text-xl font-bold ${inStock > 0 ? 'text-emerald-600' : 'text-red-500'}">${inStock}/${totalVariants}</div>
+                        <div class="text-xs text-gray-400">in stock</div>
+                    </div>
+                </div>` : '<div class="text-gray-400">No price data yet</div>'}
+            </div>
+        </div>
+    `;
+
+    // Render chart
+    renderChart(product, history);
+
+    // Render where to buy
+    renderBuyList(product, latestByUrl);
+
+    // Render alerts
+    renderAlerts(product, avg);
+
+    // Set frequency selector to current value
+    initFrequency(product);
+}
+
+let chartInstance = null;
+let chartProduct = null;
+let chartHistory = null;
+let currentRange = 30;
+
+function setRange(days) {
+    currentRange = days;
+    // Update button styles
+    document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.className = 'range-btn px-3 py-1 rounded-md text-xs font-medium text-gray-500 hover:bg-white';
+    });
+    event.currentTarget.className = 'range-btn px-3 py-1 rounded-md text-xs font-medium bg-white text-brand-600 shadow-sm';
+    renderChart(chartProduct, chartHistory);
+}
+
+function aggregateByDay(points) {
+    // Keep only the last price record per day
+    const byDay = {};
+    for (const p of points) {
+        const day = p.x.substring(0, 10); // YYYY-MM-DD
+        byDay[day] = p; // last one wins
+    }
+    return Object.values(byDay).sort((a, b) => a.x.localeCompare(b.x));
+}
+
+function renderChart(product, history) {
+    chartProduct = product;
+    chartHistory = history;
+
+    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+    const datasets = [];
+
+    // Filter by date range
+    let cutoff = null;
+    if (currentRange > 0) {
+        cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - currentRange);
+        cutoff = cutoff.toISOString();
+    }
+
+    // Group by RETAILER — one line per retailer showing best daily price
+    const retailerColors = {
+        'ToysForKids': '#3b82f6',
+        'BabyNeeds': '#10b981',
+        'eMAG': '#f59e0b',
+        'Nichiduta': '#ef4444',
+        'Origami': '#8b5cf6',
+    };
+    const defaultColors = ['#ec4899', '#14b8a6', '#f97316', '#6366f1'];
+
+    const retailers = [...new Set(product.tracked_urls.map(t => t.retailer))];
+
+    retailers.forEach((retailer, idx) => {
+        const retailerUrls = product.tracked_urls.filter(t => t.retailer === retailer).map(t => t.url);
+        const retailerHistory = history
+            .filter(h => retailerUrls.includes(h.url))
+            .filter(h => !cutoff || h.checked_at >= cutoff);
+
+        // Per day, take the BEST (lowest) price across all variants for this retailer
+        const byDay = {};
+        for (const h of retailerHistory) {
+            const day = h.checked_at.substring(0, 10);
+            if (!byDay[day] || h.price < byDay[day].price) {
+                byDay[day] = { x: h.checked_at, y: h.price };
+            }
+        }
+        const points = Object.values(byDay).sort((a, b) => a.x.localeCompare(b.x));
+        if (points.length === 0) return;
+
+        const color = retailerColors[retailer] || defaultColors[idx % defaultColors.length];
+        datasets.push({
+            label: retailer,
+            data: points,
+            borderColor: color,
+            backgroundColor: color + '20',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            pointBackgroundColor: color,
+        });
+    });
+
+    if (datasets.length === 0) return;
+
+    // Destroy previous chart
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(document.getElementById('priceChart'), {
+        type: 'line',
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        displayFormats: {
+                            day: 'MMM d',
+                            week: 'MMM d',
+                            month: 'MMM yyyy',
+                        },
+                        tooltipFormat: 'MMM d, yyyy',
+                    },
+                    ticks: { maxTicksLimit: 12 },
+                    grid: { display: false },
+                },
+                y: {
+                    beginAtZero: false,
+                    ticks: { callback: v => v + ' Lei' },
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(0) + ' Lei'
+                    }
+                },
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } }
+            }
+        }
+    });
+}
+
+function renderBuyList(product, latestByUrl) {
+    const list = document.getElementById('buy-list');
+    const retailerColors = {
+        'ToysForKids': { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', dot: '#3b82f6' },
+        'BabyNeeds': { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', dot: '#10b981' },
+        'eMAG': { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', dot: '#f59e0b' },
+    };
+    const defaultStyle = { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700', dot: '#6b7280' };
+
+    // Group by retailer, show best price per retailer
+    const retailers = [...new Set(product.tracked_urls.map(t => t.retailer))];
+    const retailerData = retailers.map(retailer => {
+        const urls = product.tracked_urls.filter(t => t.retailer === retailer);
+        const items = urls.map(t => ({ ...t, latest: latestByUrl[t.url] })).filter(t => t.latest);
+        const best = items.length ? items.reduce((a, b) => a.latest.price < b.latest.price ? a : b) : null;
+        const inStock = items.filter(t => t.latest.in_stock).length;
+        return { retailer, items, best, inStock, total: items.length };
+    }).filter(r => r.best).sort((a, b) => a.best.latest.price - b.best.latest.price);
+
+    list.innerHTML = retailerData.map((r, i) => {
+        const style = retailerColors[r.retailer] || defaultStyle;
+        const isBest = i === 0;
+        return `
+        <div class="rounded-lg border ${isBest ? style.border + ' ' + style.bg : 'border-gray-100 bg-gray-50'} overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-3 h-3 rounded-full flex-shrink-0" style="background:${style.dot}"></div>
+                    ${isBest ? '<span class="bg-brand-600 text-white text-xs font-bold px-2 py-0.5 rounded flex-shrink-0">BEST</span>' : ''}
+                    <div class="min-w-0">
+                        <div class="font-bold text-gray-900 text-lg">${r.retailer}</div>
+                        <div class="text-xs text-gray-500">${r.inStock}/${r.total} variants in stock</div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between sm:justify-end gap-4 flex-shrink-0 pl-6 sm:pl-0">
+                    ${r.inStock > 0
+                        ? '<span class="inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> In stock</span>'
+                        : '<span class="inline-flex items-center gap-1 text-xs text-gray-400"><span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span> Unavailable</span>'}
+                    <div class="text-right">
+                        <div class="text-sm text-gray-400">from</div>
+                        <div class="text-2xl font-bold ${isBest ? 'text-brand-600' : 'text-gray-700'}">${Math.round(r.best.latest.price)} Lei</div>
+                        ${r.best.latest.original_price ? `<div class="text-xs text-gray-400 line-through">${Math.round(r.best.latest.original_price)} Lei</div>` : ''}
+                    </div>
+                </div>
+            </div>
+            ${r.items.length > 1 ? `
+            <div class="border-t border-gray-100 px-4 py-2 bg-white/50">
+                <div class="flex flex-wrap gap-2">
+                    ${r.items.sort((a,b) => a.latest.price - b.latest.price).map(t => `
+                        <a href="${t.url}" target="_blank" class="text-xs px-2 py-1 rounded bg-white border border-gray-200 hover:border-brand-300 text-gray-600 hover:text-brand-600">
+                            ${t.variant_name ? t.variant_name.substring(0, 30) : 'variant'} — ${Math.round(t.latest.price)} Lei
+                        </a>
+                    `).join('')}
+                </div>
+            </div>` : `
+            <div class="border-t border-gray-100 px-4 py-2 bg-white/50">
+                <a href="${r.best.url}" target="_blank" class="text-xs text-brand-500 hover:underline">View on ${r.retailer}</a>
+            </div>`}
+        </div>`;
+    }).join('');
+}
+
+function renderAlerts(product, avg) {
+    const list = document.getElementById('alerts-list');
+    const alerts = product.alerts || [];
+    if (alerts.length === 0) {
+        list.innerHTML = `<p class="text-gray-400 text-sm">No alerts set. Use <code class="bg-gray-100 px-1 rounded">manage.py alert ${product.id} &lt;price&gt;</code> to add one.</p>`;
+        return;
+    }
+    list.innerHTML = alerts.map(a => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 mb-2">
+            <div>
+                <span class="font-medium text-gray-700">Notify when below</span>
+                <span class="font-bold text-brand-600">${Math.round(a.target_price)} Lei</span>
+                ${a.triggered ? '<span class="text-xs text-emerald-600 ml-2 bg-emerald-50 px-2 py-0.5 rounded-full">Triggered!</span>' : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+// ─── Frequency Settings ──────────────────────────────────────────────────────
+
+function initFrequency(product) {
+    const freq = product.check_frequency_hours || 12;
+    document.querySelectorAll('.freq-btn').forEach(btn => {
+        const btnFreq = parseInt(btn.dataset.freq);
+        if (btnFreq === freq) {
+            btn.className = 'freq-btn px-3 py-1.5 rounded-md text-sm font-medium bg-white text-brand-600 shadow-sm transition';
+        } else {
+            btn.className = 'freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition';
+        }
+    });
+}
+
+async function setFrequency(hours) {
+    // Update button styles immediately
+    document.querySelectorAll('.freq-btn').forEach(btn => {
+        const btnFreq = parseInt(btn.dataset.freq);
+        if (btnFreq === hours) {
+            btn.className = 'freq-btn px-3 py-1.5 rounded-md text-sm font-medium bg-white text-brand-600 shadow-sm transition';
+        } else {
+            btn.className = 'freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition';
+        }
+    });
+
+    const status = document.getElementById('freq-status');
+    status.textContent = 'Saving...';
+    status.className = 'text-xs text-gray-400';
+
+    try {
+        const resp = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId, check_frequency_hours: hours }),
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            status.textContent = data.error || 'Failed to save';
+            status.className = 'text-xs text-red-500';
+            return;
+        }
+
+        status.textContent = 'Saved';
+        status.className = 'text-xs text-emerald-500';
+        setTimeout(() => { status.textContent = ''; }, 2000);
+    } catch (e) {
+        status.textContent = 'Error: ' + e.message;
+        status.className = 'text-xs text-red-500';
+    }
+}
+
+// ─── Archive & Delete ────────────────────────────────────────────────────────
+
+async function archiveProduct() {
+    if (!confirm('Archive this product? It will be hidden from the dashboard but can be restored later.')) return;
+
+    const btn = document.getElementById('archive-btn');
+    btn.disabled = true;
+    btn.textContent = 'Archiving...';
+
+    try {
+        const resp = await fetch('/api/product', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'archive', product_id: productId }),
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+            window.location.href = 'index.html';
+        } else {
+            alert('Failed: ' + (data.error || 'Unknown error'));
+            btn.disabled = false;
+            btn.textContent = 'Archive Product';
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+        btn.disabled = false;
+        btn.textContent = 'Archive Product';
+    }
+}
+
+async function deleteProduct() {
+    if (!confirm('Permanently delete this product and all its price history? This cannot be undone.')) return;
+    if (!confirm('Are you sure? This will delete all tracked data for this product.')) return;
+
+    const btn = document.getElementById('delete-btn');
+    btn.disabled = true;
+    btn.textContent = 'Deleting...';
+
+    try {
+        const resp = await fetch('/api/product', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'delete', product_id: productId }),
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+            window.location.href = 'index.html';
+        } else {
+            alert('Failed: ' + (data.error || 'Unknown error'));
+            btn.disabled = false;
+            btn.textContent = 'Delete Product';
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+        btn.disabled = false;
+        btn.textContent = 'Delete Product';
+    }
+}
+
+loadProduct();
+</script>
+</body>
+</html>

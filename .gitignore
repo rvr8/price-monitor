@@ -3,3 +3,7 @@ __pycache__/
 .env
 *.db
 *.db-journal
+public/db.json
+.vercel/
+
+.vercel

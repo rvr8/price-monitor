@@ -2,6 +2,8 @@ from src.scrapers.base import BaseScraper, ScrapeResult, SearchResult, SearchRes
 from src.scrapers.emag import EmagScraper
 from src.scrapers.babyneeds import BabyNeedsScraper
 from src.scrapers.toysforkids import ToysForKidsScraper
+from src.scrapers.babymatters import BabyMattersScraper
+from src.scrapers.gomag import ErFiScraper, CaruselulCuViseScraper
 
 SCRAPERS = {
     "emag.ro": EmagScraper,
@@ -10,12 +12,19 @@ SCRAPERS = {
     "www.babyneeds.ro": BabyNeedsScraper,
     "toysforkids.ro": ToysForKidsScraper,
     "www.toysforkids.ro": ToysForKidsScraper,
+    "babymatters.ro": BabyMattersScraper,
+    "www.babymatters.ro": BabyMattersScraper,
+    "erfi.ro": ErFiScraper,
+    "www.erfi.ro": ErFiScraper,
+    "caruselulcuvise.ro": CaruselulCuViseScraper,
+    "www.caruselulcuvise.ro": CaruselulCuViseScraper,
 }
 
 # Scrapers that support search (eMAG blocked, so excluded)
 SEARCHABLE_SCRAPERS = [
     BabyNeedsScraper,
     ToysForKidsScraper,
+    BabyMattersScraper,
 ]
 
 
@@ -33,7 +42,10 @@ def detect_retailer(url: str) -> str:
     """Return retailer name from URL."""
     from urllib.parse import urlparse
     domain = urlparse(url).netloc.lower().replace("www.", "")
-    names = {"emag.ro": "eMAG", "babyneeds.ro": "BabyNeeds", "toysforkids.ro": "ToysForKids"}
+    names = {
+        "emag.ro": "eMAG", "babyneeds.ro": "BabyNeeds", "toysforkids.ro": "ToysForKids",
+        "babymatters.ro": "BabyMatters", "erfi.ro": "ErFi", "caruselulcuvise.ro": "CaruselulCuVise",
+    }
     return names.get(domain, domain)
 
 
