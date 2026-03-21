@@ -29,6 +29,16 @@
           "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black.html",
           "retailer": "ToysForKids",
           "variant_name": "Carucior Balios S Lux Cybex 2 in 1 BLK, Moon Black"
+        },
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6913",
+          "retailer": "BabyMatters",
+          "variant_name": "Carucior 2 in 1 Balios S Lux pentru copii, cu land"
+        },
+        {
+          "url": "adaptor-scaun-auto-cybex-carucior-balios-s-cybex-520003354",
+          "retailer": "ErFi",
+          "variant_name": "Adaptori scaun auto Cybex carucior Balios S"
         }
       ],
       "alerts": [],
@@ -956,8 +966,16 @@
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-21T23:05:06Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6913",
+      "price": 3277.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-21T23:12:35Z"
     }
   ],
-  "last_checked": "2026-03-21T23:05:06Z",
+  "last_checked": "2026-03-21T23:12:36Z",
   "archived_products": []
 }
