@@ -58,10 +58,14 @@
             <div id="search-box">
                 <p class="text-sm text-gray-600 mb-3">Search across all Romanian retailers. Type a product name:</p>
                 <div class="flex gap-2 mb-4">
-                    <input type="text" id="search-input" placeholder="e.g. Cybex Eezy S Twist, Bugaboo Fox, Joie Litetrax..."
-                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
-                        onkeydown="if(event.key==='Enter')searchProducts()">
-                    <button onclick="searchProducts()" id="search-btn" class="bg-brand-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-brand-700 whitespace-nowrap">
+                    <div class="flex-1 relative">
+                        <input type="text" id="search-input" placeholder="e.g. Cybex Eezy S Twist, Bugaboo Fox, Joie Litetrax..."
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+                            onkeydown="if(event.key==='Enter'){hideHints();searchProducts()}else if(event.key==='ArrowDown'){focusHint(1)}else if(event.key==='ArrowUp'){focusHint(-1)}else if(event.key==='Escape'){hideHints()}"
+                            oninput="showHints(this.value)" autocomplete="off">
+                        <div id="hints-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"></div>
+                    </div>
+                    <button onclick="hideHints();searchProducts()" id="search-btn" class="bg-brand-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-brand-700 whitespace-nowrap">
                         Search
                     </button>
                 </div>
@@ -103,6 +107,112 @@ async function fetchDb() {
     const resp = await fetch(DB_URL_FALLBACK + '?t=' + Date.now());
     return resp.json();
 }
+
+// ─── Search Autocomplete Hints ───────────────────────────────────────────────
+
+const PRODUCT_HINTS = [
+    // Cybex
+    'Cybex Balios S Lux', 'Cybex Balios S Lux 2 in 1', 'Cybex Balios S Lux 3 in 1',
+    'Cybex Eezy S Twist', 'Cybex Eezy S Twist+2', 'Cybex Melio',
+    'Cybex Melio Carbon', 'Cybex Priam', 'Cybex Mios', 'Cybex Libelle',
+    'Cybex Gazelle S', 'Cybex Talos S Lux', 'Cybex Orfeo',
+    'Cybex Cloud G', 'Cybex Cloud T', 'Cybex Sirona',
+    // Bugaboo
+    'Bugaboo Fox', 'Bugaboo Fox 5', 'Bugaboo Fox Cub', 'Bugaboo Fox Cub 2',
+    'Bugaboo Dragonfly', 'Bugaboo Butterfly', 'Bugaboo Donkey 5',
+    'Bugaboo Bee 5', 'Bugaboo Cameleon',
+    // Anex
+    'Anex Flo', 'Anex Flo Solo', 'Anex IQ', 'Anex IQ Basic',
+    'Anex Mev', 'Anex e/type', 'Anex Cross',
+    // Joie
+    'Joie Litetrax', 'Joie Versatrax', 'Joie Mytrax', 'Joie Chrome',
+    'Joie Finiti', 'Joie Parcel', 'Joie Aeria', 'Joie Tourist',
+    'Joie i-Spin', 'Joie i-Trillo', 'Joie Trillo Shield',
+    // Joolz
+    'Joolz Hub', 'Joolz Hub+', 'Joolz Day+', 'Joolz Aer+', 'Joolz Geo3',
+    // Maxi-Cosi
+    'Maxi-Cosi Zelia', 'Maxi-Cosi Lila', 'Maxi-Cosi Leona',
+    'Maxi-Cosi Nova', 'Maxi-Cosi Adorra', 'Maxi-Cosi CabrioFix',
+    'Maxi-Cosi Pebble', 'Maxi-Cosi Pearl',
+    // Stokke
+    'Stokke Xplory', 'Stokke Beat', 'Stokke Tripp Trapp', 'Stokke Clikk',
+    // Chicco
+    'Chicco Goody', 'Chicco Goody Plus', 'Chicco Best Friend',
+    'Chicco Trio Sprint', 'Chicco Ohlala',
+    // KinderKraft
+    'KinderKraft Grande', 'KinderKraft Everyday', 'KinderKraft Nubi',
+    'KinderKraft Route', 'KinderKraft Moov',
+    // Others
+    'Silver Cross Reef', 'Silver Cross Wave', 'Silver Cross Jet',
+    'Uppababy Vista', 'Uppababy Cruz', 'Uppababy Minu',
+    'Nuna MIXX', 'Nuna TRVL', 'Nuna DEMI', 'Nuna Triv',
+    'Britax Smile', 'Britax B-Agile',
+    'ABC Design Salsa', 'ABC Design Avito',
+    'Lionelo Annet', 'Lionelo Mika', 'Lionelo Amber',
+    'Chipolino Havana', 'Chipolino Elite',
+    'Egg2', 'iCandy Peach', 'Mima Xari',
+    // Baby beds / furniture
+    'Patut copii', 'Patut bebe lemn', 'Patut convertibil',
+    'Scaun auto copii', 'Scaun auto isofix',
+    'Marsupiu bebe', 'Balansoar bebe', 'Premergator',
+];
+
+let hintIndex = -1;
+
+function showHints(value) {
+    const dropdown = document.getElementById('hints-dropdown');
+    if (!value || value.length < 2) { dropdown.classList.add('hidden'); return; }
+
+    const query = value.toLowerCase();
+    const matches = PRODUCT_HINTS.filter(h => h.toLowerCase().includes(query)).slice(0, 8);
+
+    if (matches.length === 0) { dropdown.classList.add('hidden'); return; }
+
+    hintIndex = -1;
+    dropdown.innerHTML = matches.map((h, i) => {
+        // Bold the matching part
+        const idx = h.toLowerCase().indexOf(query);
+        const before = h.substring(0, idx);
+        const match = h.substring(idx, idx + query.length);
+        const after = h.substring(idx + query.length);
+        return `<div class="hint-item px-4 py-2.5 text-sm cursor-pointer hover:bg-brand-50 text-gray-700 border-b border-gray-50 last:border-0"
+                     onmousedown="selectHint('${h.replace(/'/g, "\\'")}')"
+                     data-index="${i}">
+                    ${before}<strong class="text-brand-600">${match}</strong>${after}
+                </div>`;
+    }).join('');
+    dropdown.classList.remove('hidden');
+}
+
+function hideHints() {
+    document.getElementById('hints-dropdown').classList.add('hidden');
+    hintIndex = -1;
+}
+
+function selectHint(value) {
+    document.getElementById('search-input').value = value;
+    hideHints();
+    searchProducts();
+}
+
+function focusHint(dir) {
+    const items = document.querySelectorAll('.hint-item');
+    if (items.length === 0) return;
+    hintIndex = Math.max(-1, Math.min(items.length - 1, hintIndex + dir));
+    items.forEach((el, i) => {
+        el.classList.toggle('bg-brand-50', i === hintIndex);
+    });
+    if (hintIndex >= 0) {
+        document.getElementById('search-input').value = PRODUCT_HINTS.filter(
+            h => h.toLowerCase().includes(document.getElementById('search-input').value.toLowerCase())
+        )[hintIndex] || document.getElementById('search-input').value;
+    }
+}
+
+// Close hints when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#search-box')) hideHints();
+});
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
@@ -187,7 +297,25 @@ async function loadDashboard() {
                         ${signal ? `<span class="text-xs font-medium px-2 py-1 rounded-full ${signalColor}">${signal}</span>` : ''}
                     </div>` : '<div class="text-gray-400 mb-3">No price data yet</div>'}
                     <div class="flex flex-wrap gap-1.5">${badges}</div>
-                    <div class="mt-3 text-xs text-gray-400">${product.tracked_urls.length} variant${product.tracked_urls.length !== 1 ? 's' : ''} across ${uniqueRetailers.length} retailer${uniqueRetailers.length !== 1 ? 's' : ''}</div>
+                    <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-gray-100 text-center">
+                        <div>
+                            <div class="text-[10px] text-gray-400 uppercase">Min</div>
+                            <div class="text-sm font-semibold text-emerald-600">${allTimeLow ? Math.round(allTimeLow) : '—'}</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-gray-400 uppercase">Max</div>
+                            <div class="text-sm font-semibold text-red-500">${allPrices.length ? Math.round(Math.max(...allPrices)) : '—'}</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-gray-400 uppercase">Freq</div>
+                            <div class="text-sm font-semibold text-gray-600">${product.check_frequency_hours || 12}h</div>
+                        </div>
+                    </div>
+                    <button onclick="event.preventDefault();event.stopPropagation();checkProduct('${product.id}',this)"
+                        class="w-full mt-3 px-3 py-2 rounded-lg text-xs font-medium border border-brand-200 text-brand-600 bg-brand-50 hover:bg-brand-100 transition flex items-center justify-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Check Now
+                    </button>
                 </div>
             `;
             grid.appendChild(card);
@@ -196,6 +324,30 @@ async function loadDashboard() {
         console.error('Failed to load data:', e);
         document.getElementById('empty-state').classList.remove('hidden');
         document.getElementById('empty-state').querySelector('h2').textContent = 'Failed to load data';
+    }
+}
+
+async function checkProduct(productId, btn) {
+    const origHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<div class="animate-spin w-3.5 h-3.5 border-2 border-brand-300 border-t-brand-600 rounded-full"></div> Checking...';
+    try {
+        const resp = await fetch('/api/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId }),
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+            btn.innerHTML = '✓ ' + data.prices_checked + ' prices checked';
+            btn.className = btn.className.replace('border-brand-200 text-brand-600 bg-brand-50', 'border-emerald-200 text-emerald-600 bg-emerald-50');
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            btn.innerHTML = 'Error: ' + (data.error || 'Failed');
+            btn.className = btn.className.replace('border-brand-200 text-brand-600 bg-brand-50', 'border-red-200 text-red-600 bg-red-50');
+        }
+    } catch (e) {
+        btn.innerHTML = 'Error';
     }
 }
 

@@ -27,3 +27,11 @@ See ARCHITECTURE.md for full details.
 5. Never hand off an untested deploy to the user
 
 **⚠️ MOBILE CHECK IS NOT OPTIONAL.** If you skip step 3, the deploy is not complete. This has been a recurring failure — IC must verify mobile layout is checked before marking any deploy task as done.
+
+## Feature Testing Rule
+
+**MANDATORY:** Every feature must be tested with **at least 2 different scenarios** before marking it done:
+- Scenario 1: Happy path (normal expected use)
+- Scenario 2: Different input/product/edge case
+- Both scenarios must be tested via the actual UI (click buttons, not just curl)
+- Use `window.confirm = () => true` in Chrome JS to bypass confirm dialogs during automated testing

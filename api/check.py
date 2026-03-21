@@ -1,14 +1,20 @@
-"""Vercel serverless function: update product settings (e.g. check frequency)."""
+"""Vercel serverless function: check prices for a single product on demand."""
 
 import json
 import os
+import sys
 from base64 import b64decode, b64encode
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.scrapers import get_scraper
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
 GITHUB_REPO = os.environ.get("GITHUB_REPO", "rvr8/price-monitor").strip()
 DB_FILE_PATH = "docs/db.json"
-VALID_FREQUENCIES = [1, 6, 12, 24]
 
 
 def _github_headers():
@@ -56,32 +62,50 @@ class handler(BaseHTTPRequestHandler):
         try:
             content_length = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(content_length)) if content_length else {}
-
             product_id = body.get("product_id", "").strip()
-            frequency = body.get("check_frequency_hours")
 
             if not product_id:
                 self._json_response(400, {"error": "product_id is required"})
                 return
-            if frequency not in VALID_FREQUENCIES:
-                self._json_response(400, {"error": f"check_frequency_hours must be one of {VALID_FREQUENCIES}"})
-                return
 
             db, sha = _get_db_from_github()
-
             product = next((p for p in db["products"] if p["id"] == product_id), None)
             if not product:
                 self._json_response(404, {"error": f"Product '{product_id}' not found"})
                 return
 
-            product["check_frequency_hours"] = frequency
+            now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            checked = 0
+            errors = 0
 
-            _put_db_to_github(db, sha, f"settings: {product['name']} freq={frequency}h")
+            for tracked in product["tracked_urls"]:
+                url = tracked["url"]
+                try:
+                    scraper = get_scraper(url)
+                    result = scraper.scrape(url)
+                    if result.success:
+                        db["price_history"].append({
+                            "product_id": product_id,
+                            "url": url,
+                            "price": result.price,
+                            "original_price": result.original_price,
+                            "in_stock": result.in_stock,
+                            "checked_at": now,
+                        })
+                        checked += 1
+                except Exception:
+                    errors += 1
+
+            product["last_checked"] = now
+            db["last_checked"] = now
+
+            _put_db_to_github(db, sha, f"check: {product['name']} (manual)")
 
             self._json_response(200, {
-                "status": "updated",
+                "status": "checked",
                 "product_id": product_id,
-                "check_frequency_hours": frequency,
+                "prices_checked": checked,
+                "errors": errors,
             })
 
         except Exception as e:

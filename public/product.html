@@ -74,21 +74,33 @@
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Settings</h2>
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <label class="text-sm text-gray-600 whitespace-nowrap">Check frequency:</label>
-                <div class="flex gap-1 bg-gray-100 rounded-lg p-1" id="freq-selector">
+                <div class="flex flex-wrap gap-1 bg-gray-100 rounded-lg p-1" id="freq-selector">
+                    <button onclick="setFrequency(1)" data-freq="1"
+                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
+                        1h
+                    </button>
                     <button onclick="setFrequency(6)" data-freq="6"
                         class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
-                        Every 6h
+                        6h
                     </button>
                     <button onclick="setFrequency(12)" data-freq="12"
                         class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium bg-white text-brand-600 shadow-sm transition">
-                        Every 12h
+                        12h
                     </button>
                     <button onclick="setFrequency(24)" data-freq="24"
                         class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
-                        Every 24h
+                        24h
                     </button>
                 </div>
                 <span id="freq-status" class="text-xs text-gray-400"></span>
+            </div>
+            <div class="border-t border-gray-100 mt-4 pt-4 flex flex-col sm:flex-row gap-2 items-start">
+                <button onclick="checkNow()" id="check-now-btn"
+                    class="px-4 py-2 rounded-lg text-sm font-medium border border-brand-300 text-brand-700 bg-brand-50 hover:bg-brand-100 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Check Prices Now
+                </button>
+                <span id="check-now-status" class="text-xs text-gray-400 self-center"></span>
             </div>
             <div class="border-t border-gray-100 mt-4 pt-4 flex flex-col sm:flex-row gap-2">
                 <button onclick="archiveProduct()" id="archive-btn"
@@ -280,15 +292,15 @@ function renderChart(product, history) {
             .filter(h => retailerUrls.includes(h.url))
             .filter(h => !cutoff || h.checked_at >= cutoff);
 
-        // Per day, take the BEST (lowest) price across all variants for this retailer
-        const byDay = {};
+        // Per check timestamp, take the BEST (lowest) price across all variants for this retailer
+        const byTimestamp = {};
         for (const h of retailerHistory) {
-            const day = h.checked_at.substring(0, 10);
-            if (!byDay[day] || h.price < byDay[day].price) {
-                byDay[day] = { x: h.checked_at, y: h.price };
+            const ts = h.checked_at;
+            if (!byTimestamp[ts] || h.price < byTimestamp[ts].price) {
+                byTimestamp[ts] = { x: ts, y: h.price };
             }
         }
-        const points = Object.values(byDay).sort((a, b) => a.x.localeCompare(b.x));
+        const points = Object.values(byTimestamp).sort((a, b) => a.x.localeCompare(b.x));
         if (points.length === 0) return;
 
         const color = retailerColors[retailer] || defaultColors[idx % defaultColors.length];
@@ -479,6 +491,40 @@ async function setFrequency(hours) {
         status.textContent = 'Error: ' + e.message;
         status.className = 'text-xs text-red-500';
     }
+}
+
+// ─── Check Prices Now ────────────────────────────────────────────────────────
+
+async function checkNow() {
+    const btn = document.getElementById('check-now-btn');
+    const status = document.getElementById('check-now-status');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-brand-300 border-t-brand-600 rounded-full"></div> Checking...';
+    status.textContent = '';
+
+    try {
+        const resp = await fetch('/api/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId }),
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            status.textContent = data.error || 'Failed';
+            status.className = 'text-xs text-red-500 self-center';
+        } else {
+            status.textContent = `Checked ${data.prices_checked} URLs. Reloading...`;
+            status.className = 'text-xs text-emerald-500 self-center';
+            setTimeout(() => location.reload(), 2000);
+        }
+    } catch (e) {
+        status.textContent = 'Error: ' + e.message;
+        status.className = 'text-xs text-red-500 self-center';
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Check Prices Now';
 }
 
 // ─── Archive & Delete ────────────────────────────────────────────────────────
