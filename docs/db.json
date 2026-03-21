@@ -64,6 +64,19 @@
       "alerts": [],
       "check_frequency_hours": 6,
       "last_checked": "2026-03-21T21:21:41Z"
+    },
+    {
+      "id": "erfi-scrape-test",
+      "name": "ErFi Scrape Test",
+      "image_url": null,
+      "tracked_urls": [
+        {
+          "url": "https://www.erfi.ro/carucior-cybex-balios-s-lux-taupe-almond-beige-cybex-524001211.html",
+          "retailer": "ErFi",
+          "variant_name": "Cybex Balios ErFi"
+        }
+      ],
+      "alerts": []
     }
   ],
   "price_history": [
@@ -466,8 +479,16 @@
       "original_price": 3748.0,
       "in_stock": true,
       "checked_at": "2026-03-21T21:31:08Z"
+    },
+    {
+      "product_id": "erfi-scrape-test",
+      "url": "https://www.erfi.ro/carucior-cybex-balios-s-lux-taupe-almond-beige-cybex-524001211.html",
+      "price": 2249.0,
+      "original_price": 2575.0,
+      "in_stock": true,
+      "checked_at": "2026-03-21T21:35:50Z"
     }
   ],
-  "last_checked": "2026-03-21T21:33:12Z",
+  "last_checked": "2026-03-21T21:35:52Z",
   "archived_products": []
 }
