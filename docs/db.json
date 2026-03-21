@@ -27,6 +27,19 @@
         }
       ],
       "alerts": []
+    },
+    {
+      "id": "balios-s-lux-cybex-2-in-1",
+      "name": "Balios S Lux Cybex 2 in 1",
+      "image_url": "https://www.toysforkids.ro/images/thumbnails/240/290/detailed/115/carucior-cybex-balios-s-lux-2-in-1-taupe-seashell-beige.webp",
+      "tracked_urls": [
+        {
+          "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black.html",
+          "retailer": "ToysForKids",
+          "variant_name": "Carucior Balios S Lux Cybex 2 in 1 TPE, Almond Bei"
+        }
+      ],
+      "alerts": []
     }
   ],
   "price_history": [
@@ -349,7 +362,15 @@
       "original_price": 2498.0,
       "in_stock": true,
       "checked_at": "2026-03-21T08:50:28Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black.html",
+      "price": 3190.0,
+      "original_price": 3748.0,
+      "in_stock": true,
+      "checked_at": "2026-03-21T13:34:17Z"
     }
   ],
-  "last_checked": "2026-03-21T08:50:28Z"
+  "last_checked": "2026-03-21T13:34:19Z"
 }
