@@ -31,21 +31,6 @@
       "last_checked": "2026-03-21T21:21:41Z"
     },
     {
-      "id": "bugaboo-fox-cub-black-stormy-2-in-1",
-      "name": "Bugaboo Fox Cub Black/Stormy 2 in 1",
-      "image_url": "https://www.toysforkids.ro/images/thumbnails/240/290/detailed/119/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1-665954.jpg",
-      "tracked_urls": [
-        {
-          "url": "https://www.toysforkids.ro/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1.html",
-          "retailer": "ToysForKids",
-          "variant_name": "Carucior Bugaboo Fox Cub Black/Stormy Blue 2 in 1"
-        }
-      ],
-      "alerts": [],
-      "check_frequency_hours": 6,
-      "last_checked": "2026-03-21T21:21:41Z"
-    },
-    {
       "id": "balios-s-lux-cybex-2-in-1",
       "name": "Balios S Lux Cybex 2 in 1",
       "image_url": "https://www.toysforkids.ro/images/thumbnails/240/290/detailed/115/carucior-cybex-balios-s-lux-2-in-1-taupe-seashell-beige.webp",
@@ -448,5 +433,22 @@
     }
   ],
   "last_checked": "2026-03-21T21:21:41Z",
-  "archived_products": []
+  "archived_products": [
+    {
+      "id": "bugaboo-fox-cub-black-stormy-2-in-1",
+      "name": "Bugaboo Fox Cub Black/Stormy 2 in 1",
+      "image_url": "https://www.toysforkids.ro/images/thumbnails/240/290/detailed/119/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1-665954.jpg",
+      "tracked_urls": [
+        {
+          "url": "https://www.toysforkids.ro/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1.html",
+          "retailer": "ToysForKids",
+          "variant_name": "Carucior Bugaboo Fox Cub Black/Stormy Blue 2 in 1"
+        }
+      ],
+      "alerts": [],
+      "check_frequency_hours": 6,
+      "last_checked": "2026-03-21T21:21:41Z",
+      "archived_at": "2026-03-21T21:24:40Z"
+    }
+  ]
 }
