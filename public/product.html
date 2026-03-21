@@ -198,8 +198,8 @@ async function loadProduct() {
     const inStock = latestPrices.filter(p => p.in_stock).length;
     const totalVariants = product.tracked_urls.length;
 
-    // Buy signal
-    let signalText = '', signalClass = '';
+    // Buy signal + historical insights
+    let signalText = '', signalClass = '', insightText = '';
     if (bestPrice <= allTimeLow) {
         signalText = 'Best price ever — buy now!';
         signalClass = 'bg-emerald-50 border-emerald-200 text-emerald-700';
@@ -210,6 +210,24 @@ async function loadProduct() {
         signalText = 'Above average — consider waiting';
         signalClass = 'bg-amber-50 border-amber-200 text-amber-700';
     }
+
+    // Historical insights
+    const insights = [];
+    if (allTimeLow && bestPrice > allTimeLow) {
+        const pctAboveLow = Math.round((bestPrice - allTimeLow) / allTimeLow * 100);
+        insights.push(`${pctAboveLow}% above the all-time low of ${Math.round(allTimeLow)} Lei`);
+    }
+    if (allTimeHigh && allTimeHigh > bestPrice) {
+        const savings = Math.round(allTimeHigh - bestPrice);
+        insights.push(`${savings} Lei cheaper than the highest recorded price`);
+    }
+    if (history.length >= 2) {
+        const sorted = [...history].sort((a, b) => a.checked_at.localeCompare(b.checked_at));
+        const firstCheck = new Date(sorted[0].checked_at);
+        const daysSinceFirst = Math.max(1, Math.round((Date.now() - firstCheck) / 86400000));
+        insights.push(`Tracking for ${daysSinceFirst} day${daysSinceFirst !== 1 ? 's' : ''} across ${[...new Set(product.tracked_urls.map(u => u.retailer))].length} retailers`);
+    }
+    insightText = insights.join(' · ');
 
     // Render header
     document.getElementById('product-header').innerHTML = `
@@ -224,6 +242,7 @@ async function loadProduct() {
                 <div class="rounded-lg p-4 mb-4 border ${signalClass}">
                     <div class="font-bold text-lg">${signalText}</div>
                     <div class="text-sm opacity-80">Current best: ${Math.round(bestPrice)} Lei${allTimeLow !== bestPrice ? ' — lowest was ' + Math.round(allTimeLow) + ' Lei' : ' — this is the lowest price recorded'}</div>
+                    ${insightText ? `<div class="text-xs mt-1 opacity-60">${insightText}</div>` : ''}
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div class="bg-gray-50 rounded-lg p-3 text-center">

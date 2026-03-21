@@ -230,9 +230,28 @@ document.addEventListener('click', (e) => {
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
+let dashboardDb = null;
+let currentSort = 'price';
+
+function sortProducts(by) {
+    currentSort = by;
+    document.querySelectorAll('.sort-btn').forEach(b => {
+        b.className = 'sort-btn text-xs px-2.5 py-1 rounded-md text-gray-500 hover:bg-gray-100';
+    });
+    if (event && event.currentTarget) {
+        event.currentTarget.className = 'sort-btn text-xs px-2.5 py-1 rounded-md bg-brand-50 text-brand-600 font-medium';
+    }
+    if (dashboardDb) renderCards(dashboardDb);
+}
+
+function filterProducts() {
+    if (dashboardDb) renderCards(dashboardDb);
+}
+
 async function loadDashboard() {
     try {
         const db = await fetchDb();
+        dashboardDb = db;
 
         document.getElementById('last-checked').textContent = db.last_checked
             ? 'Last checked: ' + new Date(db.last_checked).toLocaleString()
@@ -247,10 +266,47 @@ async function loadDashboard() {
             return;
         }
 
-        const grid = document.getElementById('products-grid');
-        grid.innerHTML = '';
+        // Populate retailer filter
+        const allRetailers = [...new Set(products.flatMap(p => p.tracked_urls.map(u => u.retailer)))];
+        const filterEl = document.getElementById('retailer-filter');
+        filterEl.innerHTML = '<option value="">All retailers</option>' +
+            allRetailers.map(r => `<option value="${r}">${r}</option>`).join('');
 
-        for (const product of products) {
+        document.getElementById('sort-bar').style.display = 'flex';
+        renderCards(db);
+    } catch (e) {
+        console.error('Failed to load data:', e);
+        document.getElementById('empty-state').classList.remove('hidden');
+    }
+}
+
+function renderCards(db) {
+    let products = [...(db.products || [])];
+
+    // Filter
+    const filterVal = document.getElementById('retailer-filter')?.value || '';
+    if (filterVal) {
+        products = products.filter(p => p.tracked_urls.some(u => u.retailer === filterVal));
+    }
+
+    // Sort
+    products.sort((a, b) => {
+        const ha = db.price_history.filter(h => h.product_id === a.id);
+        const hb = db.price_history.filter(h => h.product_id === b.id);
+        if (currentSort === 'price') {
+            const pa = ha.length ? Math.min(...ha.map(h => h.price)) : Infinity;
+            const pb = hb.length ? Math.min(...hb.map(h => h.price)) : Infinity;
+            return pa - pb;
+        }
+        if (currentSort === 'name') return a.name.localeCompare(b.name);
+        if (currentSort === 'checks') return hb.length - ha.length;
+        return 0;
+    });
+
+    const grid = document.getElementById('products-grid');
+    grid.innerHTML = '';
+
+    for (const product of products) {
             const history = db.price_history.filter(h => h.product_id === product.id);
 
             // Get latest price per URL
@@ -334,11 +390,6 @@ async function loadDashboard() {
             `;
             grid.appendChild(card);
         }
-    } catch (e) {
-        console.error('Failed to load data:', e);
-        document.getElementById('empty-state').classList.remove('hidden');
-        document.getElementById('empty-state').querySelector('h2').textContent = 'Failed to load data';
-    }
 }
 
 async function checkProduct(productId, btn) {
