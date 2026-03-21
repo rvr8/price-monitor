@@ -66,7 +66,8 @@
           "variant_name": "Carucior Cybex, Balios S Lux 3 in 1 TPE, Moss Gree"
         }
       ],
-      "alerts": []
+      "alerts": [],
+      "last_checked": "2026-03-21T21:53:05Z"
     }
   ],
   "price_history": [
@@ -541,9 +542,49 @@
       "original_price": 2498.0,
       "in_stock": true,
       "checked_at": "2026-03-21T21:51:46Z"
+    },
+    {
+      "product_id": "cybex-balios-s-lux-3-in-1",
+      "url": "https://www.toysforkids.ro/carucior-cybex-balios-s-lux-3-in-1-moon-black-ro.html",
+      "price": 3980.0,
+      "original_price": 5296.0,
+      "in_stock": true,
+      "checked_at": "2026-03-21T21:53:05Z"
+    },
+    {
+      "product_id": "cybex-balios-s-lux-3-in-1",
+      "url": "https://www.toysforkids.ro/carucior-cybex-balios-s-lux-3-in-1-blk-moon-black.html",
+      "price": 4390.0,
+      "original_price": 5296.0,
+      "in_stock": true,
+      "checked_at": "2026-03-21T21:53:05Z"
+    },
+    {
+      "product_id": "cybex-balios-s-lux-3-in-1",
+      "url": "https://www.toysforkids.ro/carucior-cybex-balios-s-lux-3-in-1-moon-black.html",
+      "price": 4390.0,
+      "original_price": 5296.0,
+      "in_stock": true,
+      "checked_at": "2026-03-21T21:53:05Z"
+    },
+    {
+      "product_id": "cybex-balios-s-lux-3-in-1",
+      "url": "https://www.toysforkids.ro/carucior-cybex-balios-s-lux-3-in-1-tpe-sky-blue.html",
+      "price": 4390.0,
+      "original_price": 5296.0,
+      "in_stock": true,
+      "checked_at": "2026-03-21T21:53:05Z"
+    },
+    {
+      "product_id": "cybex-balios-s-lux-3-in-1",
+      "url": "https://www.toysforkids.ro/carucior-cybex-balios-s-lux-3-in-1-blk-moon-black-ro-2.html",
+      "price": 4390.0,
+      "original_price": 5296.0,
+      "in_stock": true,
+      "checked_at": "2026-03-21T21:53:05Z"
     }
   ],
-  "last_checked": "2026-03-21T21:51:46Z",
+  "last_checked": "2026-03-21T21:53:05Z",
   "archived_products": [
     {
       "id": "product-1",
