@@ -152,9 +152,12 @@ class handler(BaseHTTPRequestHandler):
             # Check if product already exists
             existing = next((p for p in db["products"] if p["id"] == product_id), None)
             if existing:
-                # Add new URLs that aren't already tracked
+                # Auto-discover URLs from other retailers first
+                auto_urls = _auto_discover_urls(name, existing["tracked_urls"])
+                # Combine user URLs + auto-discovered
+                all_new = tracked_urls + (auto_urls or [])
                 existing_urls = {u["url"] for u in existing["tracked_urls"]}
-                new_urls = [u for u in tracked_urls if u["url"] not in existing_urls]
+                new_urls = [u for u in all_new if u["url"] not in existing_urls]
                 if not new_urls:
                     self._json_response(200, {
                         "status": "already_tracked",
@@ -175,17 +178,17 @@ class handler(BaseHTTPRequestHandler):
                     "alerts": [],
                 })
 
-            # Auto-discover: search OTHER retailers for the same product
-            auto_urls = _auto_discover_urls(name, tracked_urls)
-            if auto_urls:
-                # Add to product (existing or new)
-                product_obj = existing or db["products"][-1]
-                existing_url_set = {u["url"] for u in product_obj["tracked_urls"]}
-                for au in auto_urls:
-                    if au["url"] not in existing_url_set:
-                        product_obj["tracked_urls"].append(au)
-                        tracked_urls.append(au)
-                        existing_url_set.add(au["url"])
+            # For NEW products, auto-discover URLs from other retailers
+            if not existing:
+                auto_urls = _auto_discover_urls(name, tracked_urls)
+                if auto_urls:
+                    product_obj = db["products"][-1]
+                    existing_url_set = {u["url"] for u in product_obj["tracked_urls"]}
+                    for au in auto_urls:
+                        if au["url"] not in existing_url_set:
+                            product_obj["tracked_urls"].append(au)
+                            tracked_urls.append(au)
+                            existing_url_set.add(au["url"])
 
             # Scrape initial prices for ALL new URLs (including auto-discovered)
             price_records = _check_prices_for_urls(tracked_urls, product_id)

@@ -33,6 +33,7 @@
                 </a>
                 <div class="flex items-center gap-4">
                     <a href="retailers.html" class="text-sm text-gray-500 hover:text-brand-600">Retailers</a>
+                    <a href="compare.html" class="text-sm text-gray-500 hover:text-brand-600">Compare</a>
                     <a href="archive.html" class="text-sm text-gray-500 hover:text-brand-600">Archive</a>
                     <span id="last-checked" class="text-xs text-gray-400"></span>
                 </div>
@@ -74,6 +75,19 @@
                 <!-- Search Results -->
                 <div id="search-results" class="hidden space-y-3 mt-4"></div>
             </div>
+        </div>
+
+        <!-- Sort/Filter bar -->
+        <div class="flex flex-wrap items-center gap-3 mb-4" id="sort-bar" style="display:none">
+            <span class="text-xs text-gray-400 uppercase tracking-wide">Sort:</span>
+            <button onclick="sortProducts('price')" class="sort-btn text-xs px-2.5 py-1 rounded-md bg-brand-50 text-brand-600 font-medium">Price ↑</button>
+            <button onclick="sortProducts('name')" class="sort-btn text-xs px-2.5 py-1 rounded-md text-gray-500 hover:bg-gray-100">Name</button>
+            <button onclick="sortProducts('checks')" class="sort-btn text-xs px-2.5 py-1 rounded-md text-gray-500 hover:bg-gray-100">Most checked</button>
+            <span class="text-gray-200">|</span>
+            <span class="text-xs text-gray-400 uppercase tracking-wide">Filter:</span>
+            <select id="retailer-filter" onchange="filterProducts()" class="text-xs px-2 py-1 rounded-md border border-gray-200 text-gray-600 bg-white">
+                <option value="">All retailers</option>
+            </select>
         </div>
 
         <div id="products-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
