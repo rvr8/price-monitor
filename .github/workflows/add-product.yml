@@ -1,0 +1,70 @@
+name: Add Product
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action: search, track-group, add-retailer, find-retailers'
+        required: true
+        type: choice
+        options:
+          - search
+          - track-group
+          - add-retailer
+          - find-retailers
+      query:
+        description: 'Search query (for search/track-group/find-retailers)'
+        required: false
+      group_number:
+        description: 'Group number to track (for track-group, from search results)'
+        required: false
+      product_id:
+        description: 'Product ID (for add-retailer/find-retailers)'
+        required: false
+      url:
+        description: 'Retailer URL to add (for add-retailer)'
+        required: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install httpx beautifulsoup4 lxml
+
+      - name: Execute action
+        run: |
+          ACTION="${{ inputs.action }}"
+          QUERY="${{ inputs.query }}"
+          GROUP="${{ inputs.group_number }}"
+          PRODUCT_ID="${{ inputs.product_id }}"
+          URL="${{ inputs.url }}"
+
+          if [ "$ACTION" = "search" ]; then
+            python manage.py search "$QUERY"
+          elif [ "$ACTION" = "track-group" ]; then
+            python manage.py track-group "$QUERY" "$GROUP"
+            # Also run initial price check
+            python check_prices.py
+          elif [ "$ACTION" = "add-retailer" ]; then
+            python manage.py add-url "$PRODUCT_ID" "$URL"
+            python check_prices.py
+          elif [ "$ACTION" = "find-retailers" ]; then
+            python manage.py find-retailers "$PRODUCT_ID"
+          fi
+
+      - name: Commit changes
+        run: |
+          git config user.name "Price Bot"
+          git config user.email "bot@price-monitor"
+          git add docs/db.json
+          git diff --cached --quiet || git commit -m "add product: ${{ inputs.query || inputs.url }}"
+          git push

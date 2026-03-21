@@ -153,15 +153,101 @@ def cmd_list():
         print(f"  Alerts: {len(p.get('alerts', []))}")
 
 
+def cmd_add_url(args):
+    """Add a retailer URL to an existing product."""
+    if len(args) < 2:
+        print("Usage: python manage.py add-url <product_id> <url>")
+        return
+    product_id = args[0]
+    url = args[1]
+    db = load_db()
+
+    product = next((p for p in db["products"] if p["id"] == product_id), None)
+    if not product:
+        print(f"Product '{product_id}' not found. Available:")
+        for p in db["products"]:
+            print(f"  {p['id']}: {p['name']}")
+        return
+
+    if any(u["url"] == url for u in product["tracked_urls"]):
+        print(f"URL already tracked: {url}")
+        return
+
+    from src.scrapers import detect_retailer
+    retailer = detect_retailer(url)
+    slug = url.rstrip("/").split("/")[-1].replace(".html", "").replace("-", " ")
+    product["tracked_urls"].append({
+        "url": url,
+        "retailer": retailer,
+        "variant_name": slug[:50],
+    })
+    save_db(db)
+    print(f"Added {retailer} URL to '{product['name']}': {url}")
+
+
+def cmd_find_retailers(args):
+    """Search all retailers for an existing product and suggest new URLs."""
+    if not args:
+        print("Usage: python manage.py find-retailers <product_id>")
+        return
+    product_id = args[0]
+    db = load_db()
+
+    product = next((p for p in db["products"] if p["id"] == product_id), None)
+    if not product:
+        print(f"Product '{product_id}' not found.")
+        return
+
+    from src.scrapers import search_all
+    print(f"Searching all retailers for '{product['name']}'...")
+    groups = search_all(product["name"])
+
+    existing_urls = {u["url"] for u in product["tracked_urls"]}
+    existing_retailers = {u["retailer"] for u in product["tracked_urls"]}
+
+    new_found = []
+    for g in groups:
+        for item in g.items:
+            if item.url not in existing_urls:
+                new_found.append(item)
+
+    if not new_found:
+        print("No new retailer URLs found.")
+        return
+
+    print(f"\nFound {len(new_found)} new URLs:")
+    for i, item in enumerate(new_found):
+        is_new_retailer = item.retailer not in existing_retailers
+        tag = " [NEW RETAILER]" if is_new_retailer else ""
+        stock = "In stock" if item.in_stock else "Out of stock"
+        print(f"  [{i+1}] {item.retailer}{tag}: {item.price:.0f} Lei ({stock})")
+        print(f"      {item.url}")
+
+    # Auto-add all new URLs
+    for item in new_found:
+        slug = item.url.rstrip("/").split("/")[-1].replace(".html", "").replace("-", " ")
+        product["tracked_urls"].append({
+            "url": item.url,
+            "retailer": item.retailer,
+            "variant_name": slug[:50],
+        })
+        print(f"  Added: {item.retailer} — {item.url}")
+
+    save_db(db)
+    print(f"\nAdded {len(new_found)} new URLs to '{product['name']}'")
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python manage.py <command>")
         print("Commands:")
-        print("  search <query>          — Search retailers for products")
-        print("  track <name> <urls...>  — Track a product with given URLs")
-        print("  track-group <query> <#> — Search and track group by number")
-        print("  alert <product_id> <$>  — Set price alert")
-        print("  list                    — List tracked products")
+        print("  search <query>            — Search retailers for products")
+        print("  track <name> <urls...>    — Track a product with given URLs")
+        print("  track-group <query> <#>   — Search and track group by number")
+        print("  add-url <product_id> <url> — Add retailer URL to product")
+        print("  find-retailers <product_id> — Find product on other retailers")
+        print("  alert <product_id> <$>    — Set price alert")
+        print("  list                      — List tracked products")
         return
 
     cmd = sys.argv[1]
@@ -173,6 +259,10 @@ def main():
         cmd_track(args)
     elif cmd == "track-group":
         cmd_track_group(args)
+    elif cmd == "add-url":
+        cmd_add_url(args)
+    elif cmd == "find-retailers":
+        cmd_find_retailers(args)
     elif cmd == "alert":
         cmd_alert(args)
     elif cmd == "list":
