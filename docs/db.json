@@ -26,7 +26,8 @@
           "variant_name": "carucior balios s lux cybex sky blue"
         }
       ],
-      "alerts": []
+      "alerts": [],
+      "check_frequency_hours": 6
     },
     {
       "id": "balios-s-lux-cybex-2-in-1",
