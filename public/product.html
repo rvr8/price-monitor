@@ -57,32 +57,33 @@
                     <canvas id="priceChart"></canvas>
                 </div>
             </div>
-            <div class="bg-white rounded-xl border border-gray-200 p-6 lg:w-48 flex-shrink-0" id="price-stats-panel">
-                <h3 class="text-sm font-semibold text-gray-900 mb-4">Price Stats</h3>
-                <div class="space-y-4">
-                    <div>
-                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Lowest</div>
-                        <div class="text-xl font-bold text-emerald-600" id="stat-min">—</div>
-                        <div class="text-[10px] text-gray-400">Lei</div>
+            <div class="bg-white rounded-xl border border-gray-200 p-5 lg:w-64 flex-shrink-0" id="price-stats-panel">
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">Retailer Prices</h3>
+                <div id="retailer-prices" class="space-y-1 mb-4">
+                    <!-- Filled by JS: per-retailer best prices -->
+                </div>
+
+                <div class="pt-3 border-t border-gray-100 mb-3">
+                    <div class="text-[10px] text-gray-400 uppercase mb-2">Check frequency</div>
+                    <div class="flex gap-1 bg-gray-100 rounded-lg p-0.5" id="freq-selector">
+                        <button onclick="setFrequency(1)" data-freq="1" class="freq-btn flex-1 px-1.5 py-1 rounded text-xs font-medium text-gray-500 hover:bg-white transition">1h</button>
+                        <button onclick="setFrequency(6)" data-freq="6" class="freq-btn flex-1 px-1.5 py-1 rounded text-xs font-medium text-gray-500 hover:bg-white transition">6h</button>
+                        <button onclick="setFrequency(12)" data-freq="12" class="freq-btn flex-1 px-1.5 py-1 rounded text-xs font-medium bg-white text-brand-600 shadow-sm transition">12h</button>
+                        <button onclick="setFrequency(24)" data-freq="24" class="freq-btn flex-1 px-1.5 py-1 rounded text-xs font-medium text-gray-500 hover:bg-white transition">24h</button>
                     </div>
-                    <div>
-                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Highest</div>
-                        <div class="text-xl font-bold text-red-500" id="stat-max">—</div>
-                        <div class="text-[10px] text-gray-400">Lei</div>
-                    </div>
-                    <div>
-                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Average</div>
-                        <div class="text-xl font-bold text-gray-700" id="stat-avg">—</div>
-                        <div class="text-[10px] text-gray-400">Lei</div>
-                    </div>
-                    <div class="pt-3 border-t border-gray-100">
-                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Check Freq</div>
-                        <div class="text-xl font-bold text-brand-600" id="stat-freq">—</div>
-                    </div>
-                    <div>
-                        <div class="text-[10px] text-gray-400 uppercase tracking-wide">Checks</div>
-                        <div class="text-xl font-bold text-gray-700" id="stat-checks">—</div>
-                    </div>
+                    <span id="freq-status" class="text-xs text-gray-400"></span>
+                </div>
+
+                <button onclick="checkNow()" id="check-now-btn"
+                    class="w-full px-3 py-2 rounded-lg text-sm font-medium border border-brand-300 text-brand-700 bg-brand-50 hover:bg-brand-100 transition flex items-center justify-center gap-2 mb-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Check Prices Now
+                </button>
+                <span id="check-now-status" class="text-xs text-gray-400 block text-center"></span>
+
+                <div class="flex justify-between text-xs text-gray-400 mt-3 pt-3 border-t border-gray-100">
+                    <span>Checks: <strong class="text-gray-700" id="stat-checks">—</strong></span>
+                    <span>Freq: <strong class="text-brand-600" id="stat-freq">—</strong></span>
                 </div>
             </div>
         </div>
@@ -99,49 +100,16 @@
             <div id="alerts-list"></div>
         </div>
 
-        <!-- Settings -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6" id="settings-section">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Settings</h2>
-            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                <label class="text-sm text-gray-600 whitespace-nowrap">Check frequency:</label>
-                <div class="flex flex-wrap gap-1 bg-gray-100 rounded-lg p-1" id="freq-selector">
-                    <button onclick="setFrequency(1)" data-freq="1"
-                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
-                        1h
-                    </button>
-                    <button onclick="setFrequency(6)" data-freq="6"
-                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
-                        6h
-                    </button>
-                    <button onclick="setFrequency(12)" data-freq="12"
-                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium bg-white text-brand-600 shadow-sm transition">
-                        12h
-                    </button>
-                    <button onclick="setFrequency(24)" data-freq="24"
-                        class="freq-btn px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:bg-white transition">
-                        24h
-                    </button>
-                </div>
-                <span id="freq-status" class="text-xs text-gray-400"></span>
-            </div>
-            <div class="border-t border-gray-100 mt-4 pt-4 flex flex-col sm:flex-row gap-2 items-start">
-                <button onclick="checkNow()" id="check-now-btn"
-                    class="px-4 py-2 rounded-lg text-sm font-medium border border-brand-300 text-brand-700 bg-brand-50 hover:bg-brand-100 transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    Check Prices Now
-                </button>
-                <span id="check-now-status" class="text-xs text-gray-400 self-center"></span>
-            </div>
-            <div class="border-t border-gray-100 mt-4 pt-4 flex flex-col sm:flex-row gap-2">
-                <button onclick="archiveProduct()" id="archive-btn"
-                    class="px-4 py-2 rounded-lg text-sm font-medium border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition">
-                    Archive Product
-                </button>
-                <button onclick="deleteProduct()" id="delete-btn"
-                    class="px-4 py-2 rounded-lg text-sm font-medium border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition">
-                    Delete Product
-                </button>
-            </div>
+        <!-- Actions -->
+        <div class="flex gap-2 mb-6">
+            <button onclick="archiveProduct()" id="archive-btn"
+                class="px-4 py-2 rounded-lg text-sm font-medium border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition">
+                Archive
+            </button>
+            <button onclick="deleteProduct()" id="delete-btn"
+                class="px-4 py-2 rounded-lg text-sm font-medium border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition">
+                Delete
+            </button>
         </div>
     </main>
 
@@ -282,15 +250,34 @@ async function loadProduct() {
     // Set frequency selector to current value
     initFrequency(product);
 
-    // Populate stats panel
+    // Populate retailer prices panel
+    const retailerColors = {
+        'ToysForKids': '#3b82f6', 'BabyNeeds': '#10b981', 'BabyMatters': '#10b981',
+        'ErFi': '#8b5cf6', 'CaruselulCuVise': '#f59e0b', 'eMAG': '#f59e0b',
+    };
+    const retailers = [...new Set(product.tracked_urls.map(t => t.retailer))];
+    const retailerPricesEl = document.getElementById('retailer-prices');
+    const retailerRows = retailers.map(r => {
+        const urls = product.tracked_urls.filter(t => t.retailer === r);
+        const prices = urls.map(u => latestByUrl[u.url]).filter(Boolean).map(h => h.price);
+        const best = prices.length ? Math.min(...prices) : null;
+        const color = retailerColors[r] || '#6b7280';
+        const isCheapest = best === bestPrice;
+        return `<div class="flex items-center justify-between py-1.5 ${isCheapest ? 'bg-emerald-50 -mx-2 px-2 rounded' : ''}">
+            <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${color}"></span>
+                <span class="text-xs font-medium ${isCheapest ? 'text-emerald-700' : 'text-gray-700'}">${r}</span>
+            </div>
+            <span class="text-sm font-bold ${isCheapest ? 'text-emerald-600' : 'text-gray-900'}">${best ? Math.round(best) : '—'}</span>
+        </div>`;
+    }).join('');
+    retailerPricesEl.innerHTML = retailerRows;
+
     const uniqueChecks = new Set(history.map(h => {
         const d = new Date(h.checked_at);
         d.setMinutes(Math.floor(d.getMinutes() / 5) * 5, 0, 0);
         return d.toISOString();
     }));
-    document.getElementById('stat-min').textContent = allPrices.length ? Math.round(Math.min(...allPrices)) : '—';
-    document.getElementById('stat-max').textContent = allPrices.length ? Math.round(Math.max(...allPrices)) : '—';
-    document.getElementById('stat-avg').textContent = avg || '—';
     document.getElementById('stat-freq').textContent = (product.check_frequency_hours || 12) + 'h';
     document.getElementById('stat-checks').textContent = uniqueChecks.size;
 }
