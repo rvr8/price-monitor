@@ -264,7 +264,6 @@ async function loadProduct() {
     initFrequency(product);
 
     // Populate stats panel
-    const allPrices = history.map(h => h.price);
     const uniqueChecks = new Set(history.map(h => {
         const d = new Date(h.checked_at);
         d.setMinutes(Math.floor(d.getMinutes() / 5) * 5, 0, 0);
