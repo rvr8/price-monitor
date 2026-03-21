@@ -80,6 +80,39 @@ def _check_prices_for_urls(tracked_urls, product_id):
     return records
 
 
+def _auto_discover_urls(product_name, existing_tracked):
+    """Search all retailers for the same product and return new URLs to track."""
+    from src.scrapers import SEARCHABLE_SCRAPERS, normalize_product_name
+
+    # Retailers we already have URLs for
+    existing_retailers = {t["retailer"] for t in existing_tracked}
+    normalized = normalize_product_name(product_name).lower()
+    query_words = [w for w in normalized.split() if len(w) > 2]
+
+    discovered = []
+    for scraper_class in SEARCHABLE_SCRAPERS:
+        scraper = scraper_class()
+        if scraper.RETAILER_NAME in existing_retailers:
+            continue  # Already have this retailer
+        try:
+            results = scraper.search(product_name, max_results=5)
+            for r in results:
+                # Check if the result matches our product (at least 2 query words in name)
+                name_lower = r.name.lower()
+                matches = sum(1 for w in query_words if w in name_lower)
+                if matches >= min(2, len(query_words)) and r.price:
+                    discovered.append({
+                        "url": r.url,
+                        "retailer": r.retailer,
+                        "variant_name": r.name[:50],
+                    })
+                    break  # One URL per retailer is enough
+        except Exception:
+            continue
+
+    return discovered
+
+
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not GITHUB_TOKEN:
@@ -142,7 +175,19 @@ class handler(BaseHTTPRequestHandler):
                     "alerts": [],
                 })
 
-            # Scrape initial prices for the new URLs
+            # Auto-discover: search OTHER retailers for the same product
+            auto_urls = _auto_discover_urls(name, tracked_urls)
+            if auto_urls:
+                # Add to product (existing or new)
+                product_obj = existing or db["products"][-1]
+                existing_url_set = {u["url"] for u in product_obj["tracked_urls"]}
+                for au in auto_urls:
+                    if au["url"] not in existing_url_set:
+                        product_obj["tracked_urls"].append(au)
+                        tracked_urls.append(au)
+                        existing_url_set.add(au["url"])
+
+            # Scrape initial prices for ALL new URLs (including auto-discovered)
             price_records = _check_prices_for_urls(tracked_urls, product_id)
             db["price_history"].extend(price_records)
             db["last_checked"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -155,6 +200,7 @@ class handler(BaseHTTPRequestHandler):
                 "product_id": product_id,
                 "urls_added": len(tracked_urls),
                 "prices_found": len(price_records),
+                "auto_discovered": len(auto_urls) if auto_urls else 0,
             })
 
         except Exception as e:
