@@ -1,0 +1,21 @@
+name: Add Product to Track
+description: Add a new product to the price monitor
+title: "[ADD] "
+labels: ["add-product"]
+body:
+  - type: input
+    id: product_name
+    attributes:
+      label: Product Name
+      description: "What product do you want to track? Be specific (brand + model)."
+      placeholder: "e.g. Cybex Eezy S Twist, Bugaboo Fox 5, Joie Litetrax 4"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Product URL (optional)
+      description: "If you already found it on a retailer site, paste the URL here."
+      placeholder: "https://www.toysforkids.ro/..."
+    validations:
+      required: false

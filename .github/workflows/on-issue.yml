@@ -1,0 +1,117 @@
+name: Process Issue Request
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    if: contains(github.event.issue.title, '[ADD]') || contains(github.event.issue.title, '[RETAILER]')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install httpx beautifulsoup4 lxml
+
+      - name: Parse issue body
+        id: parse
+        run: |
+          python - <<'PYEOF'
+          import os, re, json
+
+          body = os.environ.get('ISSUE_BODY', '')
+          title = os.environ.get('ISSUE_TITLE', '')
+
+          # Extract form fields from issue body
+          def extract_field(body, field_name):
+              # GitHub issue forms format: ### Field Name\n\nvalue\n
+              pattern = rf'### {re.escape(field_name)}\s*\n\n(.+?)(?:\n\n|$)'
+              match = re.search(pattern, body, re.DOTALL)
+              return match.group(1).strip() if match else ''
+
+          product_name = extract_field(body, 'Product Name')
+          url = extract_field(body, 'Product URL (optional)') or extract_field(body, 'Retailer URL')
+          product_id = extract_field(body, 'Product ID')
+
+          # Clean up _No response_ placeholders
+          if product_name == '_No response_': product_name = ''
+          if url == '_No response_': url = ''
+          if product_id == '_No response_': product_id = ''
+
+          is_add = '[ADD]' in title
+          is_retailer = '[RETAILER]' in title
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"product_name={product_name}\n")
+              f.write(f"url={url}\n")
+              f.write(f"product_id={product_id}\n")
+              f.write(f"is_add={'true' if is_add else 'false'}\n")
+              f.write(f"is_retailer={'true' if is_retailer else 'false'}\n")
+
+          print(f"Parsed: name={product_name}, url={url}, product_id={product_id}, add={is_add}, retailer={is_retailer}")
+          PYEOF
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+
+      - name: Add new product
+        if: steps.parse.outputs.is_add == 'true' && steps.parse.outputs.product_name != ''
+        run: |
+          echo "=== Searching for: ${{ steps.parse.outputs.product_name }} ==="
+          python manage.py search "${{ steps.parse.outputs.product_name }}"
+          echo ""
+          echo "=== Tracking group 1 ==="
+          python manage.py track-group "${{ steps.parse.outputs.product_name }}" 1
+          echo ""
+          echo "=== Running initial price check ==="
+          python check_prices.py
+
+      - name: Add new product from URL
+        if: steps.parse.outputs.is_add == 'true' && steps.parse.outputs.url != '' && steps.parse.outputs.url != '_No response_'
+        run: |
+          NAME="${{ steps.parse.outputs.product_name }}"
+          URL="${{ steps.parse.outputs.url }}"
+          echo "=== Adding URL directly: $URL ==="
+          python manage.py track "$NAME" "$URL"
+          python check_prices.py
+
+      - name: Add retailer URL
+        if: steps.parse.outputs.is_retailer == 'true'
+        run: |
+          echo "=== Adding retailer URL ==="
+          python manage.py add-url "${{ steps.parse.outputs.product_id }}" "${{ steps.parse.outputs.url }}"
+          python check_prices.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "Price Bot"
+          git config user.email "bot@price-monitor"
+          git add docs/db.json
+          git diff --cached --quiet || git commit -m "add: ${{ steps.parse.outputs.product_name || steps.parse.outputs.url }}"
+          git push
+
+      - name: Close issue with result
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '✅ Done! Product has been added to the price monitor.\n\nCheck the dashboard: https://rvr8.github.io/price-monitor/'
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });

@@ -1,0 +1,21 @@
+name: Add Retailer URL
+description: Add another retailer link for an existing product
+title: "[RETAILER] "
+labels: ["add-retailer"]
+body:
+  - type: input
+    id: product_id
+    attributes:
+      label: Product ID
+      description: "Which product? (find the ID in the dashboard URL, e.g. 'product-1')"
+      placeholder: "e.g. cybex-balios-s-lux"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Retailer URL
+      description: "Paste the product URL from the retailer site"
+      placeholder: "https://www.babyneeds.ro/..."
+    validations:
+      required: true

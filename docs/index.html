@@ -42,56 +42,25 @@
                 <h1 class="text-2xl font-bold text-gray-900">Tracked Products</h1>
                 <p class="text-gray-500 mt-1" id="product-count"></p>
             </div>
-            <button onclick="showAddProduct()" class="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition font-medium text-sm">
+            <a href="https://github.com/rvr8/price-monitor/issues/new?template=add-product.yml" target="_blank"
+                class="inline-flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition font-medium text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Add Product
-            </button>
+            </a>
         </div>
 
-        <!-- Add Product Modal -->
-        <div id="add-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-gray-900" id="modal-title">Add Product</h2>
-                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
-                </div>
-
-                <!-- Step 1: Setup (first time only) -->
-                <div id="step-setup" class="hidden">
-                    <p class="text-sm text-gray-600 mb-3">To add products from the dashboard, you need a GitHub token. This is stored only in your browser.</p>
-                    <ol class="text-sm text-gray-600 mb-4 space-y-1 list-decimal pl-4">
-                        <li>Go to <a href="https://github.com/settings/tokens/new?scopes=repo&description=price-monitor" target="_blank" class="text-brand-600 underline">GitHub → New Token</a></li>
-                        <li>Select <strong>repo</strong> scope, click Generate</li>
-                        <li>Paste the token below</li>
-                    </ol>
-                    <input type="text" id="token-input" placeholder="ghp_..." class="w-full px-3 py-2 border rounded-lg text-sm mb-3">
-                    <button onclick="saveToken()" class="w-full bg-brand-600 text-white py-2 rounded-lg text-sm font-medium">Save Token</button>
-                </div>
-
-                <!-- Step 2: Search -->
-                <div id="step-search" class="hidden">
-                    <div class="flex gap-2 mb-4">
-                        <input type="text" id="search-input" placeholder="e.g. Cybex Balios S Lux" class="flex-1 px-3 py-2 border rounded-lg text-sm">
-                        <button onclick="searchProducts()" class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Search</button>
-                    </div>
-                    <div id="search-status" class="text-sm text-gray-500 mb-2 hidden"></div>
-                    <div id="search-results" class="space-y-2 max-h-64 overflow-y-auto"></div>
-                </div>
-
-                <!-- Step 3: Running -->
-                <div id="step-running" class="hidden text-center py-8">
-                    <div class="animate-spin w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full mx-auto mb-4"></div>
-                    <p class="text-gray-600" id="running-text">Running...</p>
-                    <p class="text-xs text-gray-400 mt-2">This runs on GitHub's servers. Takes 20-40 seconds.</p>
-                </div>
-
-                <!-- Step 4: Done -->
-                <div id="step-done" class="hidden text-center py-8">
-                    <div class="text-4xl mb-2">&#9989;</div>
-                    <p class="text-gray-700 font-medium" id="done-text">Product added!</p>
-                    <button onclick="location.reload()" class="mt-4 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Refresh Dashboard</button>
-                </div>
-            </div>
+        <!-- Add Product / Add Retailer links -->
+        <div class="flex gap-3 mb-6">
+            <a href="https://github.com/rvr8/price-monitor/issues/new?template=add-product.yml" target="_blank"
+                class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:border-brand-300 hover:shadow transition text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                Track New Product
+            </a>
+            <a href="https://github.com/rvr8/price-monitor/issues/new?template=add-retailer.yml" target="_blank"
+                class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:border-brand-300 hover:shadow transition text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                Add Retailer URL
+            </a>
         </div>
 
         <div id="products-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -209,131 +178,6 @@ async function loadDashboard() {
 
 loadDashboard();
 
-// --- Add Product Modal ---
-const REPO = 'rvr8/price-monitor';
-const WORKFLOW = 'add-product.yml';
-
-function getToken() { return localStorage.getItem('gh_token'); }
-function saveToken() {
-    const token = document.getElementById('token-input').value.trim();
-    if (!token) return;
-    localStorage.setItem('gh_token', token);
-    showStep('search');
-}
-
-function showStep(step) {
-    ['setup', 'search', 'running', 'done'].forEach(s => {
-        document.getElementById('step-' + s).classList.toggle('hidden', s !== step);
-    });
-}
-
-function showAddProduct() {
-    document.getElementById('add-modal').classList.remove('hidden');
-    document.getElementById('search-results').innerHTML = '';
-    document.getElementById('search-input') && (document.getElementById('search-input').value = '');
-    showStep(getToken() ? 'search' : 'setup');
-}
-
-function closeModal() {
-    document.getElementById('add-modal').classList.add('hidden');
-}
-
-async function ghDispatch(inputs) {
-    const token = getToken();
-    const resp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/dispatches`, {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Accept': 'application/vnd.github.v3+json',
-        },
-        body: JSON.stringify({ ref: 'main', inputs }),
-    });
-    if (!resp.ok) {
-        const err = await resp.text();
-        throw new Error(`GitHub API error ${resp.status}: ${err}`);
-    }
-}
-
-async function waitForRun(startTime) {
-    const token = getToken();
-    // Poll for new workflow run
-    for (let i = 0; i < 30; i++) {
-        await new Promise(r => setTimeout(r, 3000));
-        const resp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=1`, {
-            headers: { 'Authorization': 'Bearer ' + token },
-        });
-        const data = await resp.json();
-        const run = data.workflow_runs?.[0];
-        if (run && new Date(run.created_at) > startTime) {
-            if (run.status === 'completed') return run;
-            document.getElementById('running-text').textContent =
-                'Running... (' + run.status + ')';
-        }
-    }
-    throw new Error('Timeout waiting for workflow');
-}
-
-async function searchProducts() {
-    const query = document.getElementById('search-input').value.trim();
-    if (!query) return;
-
-    showStep('running');
-    document.getElementById('running-text').textContent = 'Searching retailers for "' + query + '"...';
-
-    try {
-        const startTime = new Date();
-        await ghDispatch({ action: 'search', query });
-        const run = await waitForRun(startTime);
-
-        // Get the search results from workflow logs
-        const logsResp = await fetch(`https://api.github.com/repos/${REPO}/actions/runs/${run.id}/logs`, {
-            headers: { 'Authorization': 'Bearer ' + getToken() },
-        });
-
-        if (run.conclusion === 'success') {
-            // Search completed — show track option
-            showStep('search');
-            document.getElementById('search-results').innerHTML = `
-                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-700">
-                    Search completed! Results are in the workflow logs.
-                </div>
-                <p class="text-sm text-gray-600 mt-3 mb-2">Enter the group number to track:</p>
-                <div class="flex gap-2">
-                    <input type="number" id="group-number" value="1" min="1" class="w-20 px-3 py-2 border rounded-lg text-sm">
-                    <button onclick="trackGroup('${query}')" class="flex-1 bg-brand-600 text-white py-2 rounded-lg text-sm font-medium">Track This Product</button>
-                </div>
-                <p class="text-xs text-gray-400 mt-2">Tip: Check the <a href="https://github.com/${REPO}/actions" target="_blank" class="underline">workflow logs</a> to see which groups were found.</p>
-            `;
-        }
-    } catch (e) {
-        showStep('search');
-        document.getElementById('search-results').innerHTML =
-            '<div class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">' + e.message + '</div>';
-    }
-}
-
-async function trackGroup(query) {
-    const groupNum = document.getElementById('group-number').value;
-    showStep('running');
-    document.getElementById('running-text').textContent = 'Tracking product group #' + groupNum + '...';
-
-    try {
-        const startTime = new Date();
-        await ghDispatch({ action: 'track-group', query, group_number: groupNum });
-        const run = await waitForRun(startTime);
-
-        if (run.conclusion === 'success') {
-            showStep('done');
-            document.getElementById('done-text').textContent = 'Product added and first prices checked!';
-        } else {
-            throw new Error('Workflow failed: ' + run.conclusion);
-        }
-    } catch (e) {
-        showStep('search');
-        document.getElementById('search-results').innerHTML =
-            '<div class="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">' + e.message + '</div>';
-    }
-}
 </script>
 </body>
 </html>
