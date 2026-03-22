@@ -53,7 +53,7 @@
       ],
       "alerts": [],
       "check_frequency_hours": 6,
-      "last_checked": "2026-03-21T23:38:18Z"
+      "last_checked": "2026-03-22T00:21:39Z"
     },
     {
       "id": "product-1",
@@ -1186,8 +1186,72 @@
       "original_price": 2575.0,
       "in_stock": true,
       "checked_at": "2026-03-22T00:21:21Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black.html",
+      "price": 3190.0,
+      "original_price": 3748.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-tpe-sky-blue.html",
+      "price": 3190.0,
+      "original_price": 3748.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black-ro.html",
+      "price": 3190.0,
+      "original_price": 3748.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-blk-moon-black-ro.html",
+      "price": 3190.0,
+      "original_price": 3748.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-2-in-1-moon-black.html",
+      "price": 3190.0,
+      "original_price": 3748.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6913",
+      "price": 3277.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.exclusivmag.ro/carucior-cybex-balios-s-lux-2-in-1-cadru-negru-magnolia-pink.html",
+      "price": 2159.0,
+      "original_price": null,
+      "in_stock": false,
+      "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.erfi.ro/carucior-cybex-balios-s-lux-2-in-1-taupe-stormy-blue-cybex-524001195-2-in-1.html",
+      "price": 3476.0,
+      "original_price": 3862.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:21:39Z"
     }
   ],
-  "last_checked": "2026-03-22T00:21:21Z",
+  "last_checked": "2026-03-22T00:21:39Z",
   "archived_products": []
 }
