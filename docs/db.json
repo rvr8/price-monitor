@@ -104,6 +104,19 @@
       "alerts": [],
       "check_frequency_hours": 6,
       "last_checked": "2026-03-22T00:21:21Z"
+    },
+    {
+      "id": "bugaboo-fox-cub-black-stormy-2-in-1",
+      "name": "Bugaboo Fox Cub Black/Stormy 2 in 1",
+      "image_url": "https://www.toysforkids.ro/images/thumbnails/240/290/detailed/119/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1-665954.jpg",
+      "tracked_urls": [
+        {
+          "url": "https://www.toysforkids.ro/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1.html",
+          "retailer": "ToysForKids",
+          "variant_name": "Carucior Bugaboo Fox Cub Black/Stormy Blue 2 in 1"
+        }
+      ],
+      "alerts": []
     }
   ],
   "price_history": [
@@ -1250,8 +1263,16 @@
       "original_price": 3862.0,
       "in_stock": true,
       "checked_at": "2026-03-22T00:21:39Z"
+    },
+    {
+      "product_id": "bugaboo-fox-cub-black-stormy-2-in-1",
+      "url": "https://www.toysforkids.ro/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1.html",
+      "price": 4145.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:42:19Z"
     }
   ],
-  "last_checked": "2026-03-22T00:30:59Z",
+  "last_checked": "2026-03-22T00:42:20Z",
   "archived_products": []
 }
