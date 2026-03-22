@@ -166,7 +166,8 @@
         }
       ],
       "alerts": [],
-      "check_frequency_hours": 6
+      "check_frequency_hours": 6,
+      "last_checked": "2026-03-22T07:37:49Z"
     }
   ],
   "price_history": [
@@ -1809,8 +1810,56 @@
       "original_price": null,
       "in_stock": false,
       "checked_at": "2026-03-22T07:36:26Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-frossy-11782",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:37:49Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-lungo-11781",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:37:49Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-browny-11266",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:37:49Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-astra-10203",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:37:49Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-solo-10201",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:37:49Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-yuki-10200",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": false,
+      "checked_at": "2026-03-22T07:37:49Z"
     }
   ],
-  "last_checked": "2026-03-22T07:36:31Z",
+  "last_checked": "2026-03-22T07:37:49Z",
   "archived_products": []
 }
