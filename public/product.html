@@ -261,14 +261,21 @@ async function loadProduct() {
         const urls = product.tracked_urls.filter(t => t.retailer === r);
         const prices = urls.map(u => latestByUrl[u.url]).filter(Boolean).map(h => h.price);
         const best = prices.length ? Math.min(...prices) : null;
+        const worst = prices.length ? Math.max(...prices) : null;
         const color = retailerColors[r] || '#6b7280';
         const isCheapest = best === bestPrice;
-        return `<div class="flex items-center justify-between py-1.5 ${isCheapest ? 'bg-emerald-50 -mx-2 px-2 rounded' : ''}">
-            <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${color}"></span>
-                <span class="text-xs font-medium ${isCheapest ? 'text-emerald-700' : 'text-gray-700'}">${r}</span>
+        const rangeText = best
+            ? (best === worst ? Math.round(best) : Math.round(best) + '–' + Math.round(worst))
+            : '—';
+        return `<div class="py-1.5 ${isCheapest ? 'bg-emerald-50 -mx-2 px-2 rounded' : ''}">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${color}"></span>
+                    <span class="text-xs font-medium ${isCheapest ? 'text-emerald-700' : 'text-gray-700'}">${r}</span>
+                </div>
+                <span class="text-sm font-bold ${isCheapest ? 'text-emerald-600' : 'text-gray-900'}">${rangeText}</span>
             </div>
-            <span class="text-sm font-bold ${isCheapest ? 'text-emerald-600' : 'text-gray-900'}">${best ? Math.round(best) : '—'}</span>
+            ${prices.length > 1 ? `<div class="text-[10px] text-gray-400 ml-3.5">${prices.length} variants</div>` : ''}
         </div>`;
     }).join('');
     retailerPricesEl.innerHTML = retailerRows;

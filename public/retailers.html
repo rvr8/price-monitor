@@ -134,9 +134,14 @@ function getBadge(r) {
 
 function getStatus(r) {
     if (!r.health) return '<span class="text-gray-400">—</span>';
-    if (r.health.status === 'ok')
-        return '<span class="inline-flex items-center gap-1 text-xs text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> OK <span class="text-gray-400">(' + r.health.response_ms + 'ms)</span></span>';
-    return '<span class="inline-flex items-center gap-1 text-xs text-red-600"><span class="w-2 h-2 rounded-full bg-red-500"></span> Error</span>';
+    const h = r.health;
+    if (h.status === 'ok')
+        return `<span class="inline-flex items-center gap-1 text-xs text-emerald-600"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> ${h.detail || 'OK'}</span>`;
+    if (h.status === 'warning')
+        return `<span class="inline-flex items-center gap-1 text-xs text-amber-600"><span class="w-2 h-2 rounded-full bg-amber-500"></span> ${h.detail || 'Warning'}</span>`;
+    if (h.status === 'reachable')
+        return `<span class="inline-flex items-center gap-1 text-xs text-blue-500"><span class="w-2 h-2 rounded-full bg-blue-400"></span> ${h.detail || 'Reachable'}</span>`;
+    return `<span class="inline-flex items-center gap-1 text-xs text-red-600"><span class="w-2 h-2 rounded-full bg-red-500"></span> ${h.error || 'Error'}</span>`;
 }
 
 function renderTable(retailers) {

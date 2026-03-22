@@ -61,26 +61,43 @@ RETAILERS = [
 
 
 def _check_retailer_status(retailer_id: str) -> dict:
-    """Quick health check — try to fetch the retailer's homepage."""
-    import httpx
+    """Real scrape test — search for a known product and verify we get results with prices."""
+    from src.scrapers import SEARCHABLE_SCRAPERS, SCRAPERS
 
     retailer = next((r for r in RETAILERS if r["id"] == retailer_id), None)
     if not retailer:
         return {"status": "unknown", "error": "Not found"}
 
+    # Find the scraper class for this retailer
+    scraper_class = None
+    for sc in SEARCHABLE_SCRAPERS:
+        if sc.RETAILER_NAME == retailer["name"]:
+            scraper_class = sc
+            break
+
+    if not scraper_class:
+        # Scrape-only retailer (eMAG) — just check if site is reachable
+        import httpx
+        try:
+            resp = httpx.head(retailer["url"], headers={"User-Agent": "Mozilla/5.0"}, timeout=10, follow_redirects=True)
+            return {"status": "reachable", "detail": "Scrape-only (no search test)"}
+        except Exception as e:
+            return {"status": "error", "error": str(e)[:80]}
+
+    # Test search with a known product
     try:
-        resp = httpx.head(
-            retailer["url"],
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
-            timeout=10,
-            follow_redirects=True,
-        )
-        if resp.status_code < 400:
-            return {"status": "ok", "response_ms": int(resp.elapsed.total_seconds() * 1000)}
+        scraper = scraper_class()
+        results = scraper.search("Cybex Balios", max_results=3)
+        if results:
+            prices = [r.price for r in results if r.price]
+            return {
+                "status": "ok",
+                "detail": f"{len(results)} products found, prices: {', '.join(str(int(p)) for p in prices[:3])} Lei",
+            }
         else:
-            return {"status": "error", "error": f"HTTP {resp.status_code}"}
+            return {"status": "warning", "detail": "Search returned 0 results"}
     except Exception as e:
-        return {"status": "error", "error": str(e)[:100]}
+        return {"status": "error", "error": str(e)[:80]}
 
 
 class handler(BaseHTTPRequestHandler):
