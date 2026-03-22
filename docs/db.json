@@ -104,19 +104,6 @@
       "alerts": [],
       "check_frequency_hours": 6,
       "last_checked": "2026-03-22T00:21:21Z"
-    },
-    {
-      "id": "bugaboo-dragonfly",
-      "name": "Bugaboo Dragonfly",
-      "image_url": null,
-      "tracked_urls": [
-        {
-          "url": "https://www.toysforkids.ro/carucior-bugaboo-dragonfly-black-midnight-black.html",
-          "retailer": "ToysForKids",
-          "variant_name": "Bugaboo Dragonfly Black"
-        }
-      ],
-      "alerts": []
     }
   ],
   "price_history": [
