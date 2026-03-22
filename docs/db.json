@@ -113,7 +113,7 @@
       ],
       "alerts": [],
       "check_frequency_hours": 6,
-      "last_checked": "2026-03-22T00:46:30Z"
+      "last_checked": "2026-03-22T00:54:37Z"
     },
     {
       "id": "bugaboo-fox-cub-black-stormy-2-in-1",
@@ -1426,8 +1426,56 @@
       "original_price": null,
       "in_stock": true,
       "checked_at": "2026-03-22T00:50:23Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-blk-moon-black.html",
+      "price": 2080.0,
+      "original_price": 2498.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:54:37Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-moon-black.html",
+      "price": 2160.0,
+      "original_price": 2498.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:54:37Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-almond-beige.html",
+      "price": 2170.0,
+      "original_price": 2498.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:54:37Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://www.toysforkids.ro/carucior-balios-s-lux-cybex-sky-blue.html",
+      "price": 2170.0,
+      "original_price": 2498.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:54:37Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6891",
+      "price": 1805.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:54:37Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://www.erfi.ro/carucior-cybex-balios-s-lux-taupe-almond-beige-cybex-524001211.html",
+      "price": 2249.0,
+      "original_price": 2575.0,
+      "in_stock": true,
+      "checked_at": "2026-03-22T00:54:37Z"
     }
   ],
-  "last_checked": "2026-03-22T00:50:23Z",
+  "last_checked": "2026-03-22T00:54:37Z",
   "archived_products": []
 }
