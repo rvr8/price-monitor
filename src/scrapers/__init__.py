@@ -32,12 +32,17 @@ SEARCHABLE_SCRAPERS = [
 
 
 def get_scraper(url: str) -> BaseScraper:
-    """Auto-detect retailer from URL and return the right scraper."""
+    """Auto-detect retailer from URL and return the right scraper.
+    Falls back to GenericScraper for unknown domains."""
     from urllib.parse import urlparse
+    from src.scrapers.generic import GenericScraper
     domain = urlparse(url).netloc.lower()
     scraper_class = SCRAPERS.get(domain)
     if not scraper_class:
-        raise ValueError(f"No scraper for domain: {domain}. Supported: emag.ro, babyneeds.ro, toysforkids.ro")
+        # Fallback: generic scraper works on any site with JSON-LD or common price patterns
+        scraper = GenericScraper()
+        scraper.RETAILER_NAME = domain.replace("www.", "").split(".")[0].capitalize()
+        return scraper
     return scraper_class()
 
 
