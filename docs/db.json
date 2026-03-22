@@ -128,6 +128,44 @@
       ],
       "alerts": [],
       "last_checked": "2026-03-22T00:55:09Z"
+    },
+    {
+      "id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "name": "2 in 1 pentru copii Anex Flo spatios si usor",
+      "image_url": "https://cdn.babymatters.ro/5/81960/4e98/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-frossy.jpg",
+      "tracked_urls": [
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-frossy-11782",
+          "retailer": "BabyMatters",
+          "variant_name": "Carucior 2 in 1 pentru copii Anex Flo, spatios si "
+        },
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-lungo-11781",
+          "retailer": "BabyMatters",
+          "variant_name": "Carucior 2 in 1 pentru copii Anex Flo, spatios si "
+        },
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-browny-11266",
+          "retailer": "BabyMatters",
+          "variant_name": "Carucior 2 in 1 pentru copii Anex Flo, spatios si "
+        },
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-astra-10203",
+          "retailer": "BabyMatters",
+          "variant_name": "Carucior 2 in 1 pentru copii Anex Flo, spatios si "
+        },
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-solo-10201",
+          "retailer": "BabyMatters",
+          "variant_name": "Carucior 2 in 1 pentru copii Anex Flo, spatios si "
+        },
+        {
+          "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-yuki-10200",
+          "retailer": "BabyMatters",
+          "variant_name": "Carucior 2 in 1 pentru copii Anex Flo, spatios si "
+        }
+      ],
+      "alerts": []
     }
   ],
   "price_history": [
@@ -1722,8 +1760,56 @@
       "original_price": 2575.0,
       "in_stock": true,
       "checked_at": "2026-03-22T07:10:43Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-frossy-11782",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:36:26Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-lungo-11781",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:36:26Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-browny-11266",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:36:26Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-astra-10203",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:36:26Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-solo-10201",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-22T07:36:26Z"
+    },
+    {
+      "product_id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
+      "url": "https://babymatters.ro/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-yuki-10200",
+      "price": 5099.0,
+      "original_price": null,
+      "in_stock": false,
+      "checked_at": "2026-03-22T07:36:26Z"
     }
   ],
-  "last_checked": "2026-03-22T07:10:43Z",
+  "last_checked": "2026-03-22T07:36:31Z",
   "archived_products": []
 }
