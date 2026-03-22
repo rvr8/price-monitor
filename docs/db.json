@@ -165,7 +165,8 @@
           "variant_name": "Carucior 2 in 1 pentru copii Anex Flo, spatios si "
         }
       ],
-      "alerts": []
+      "alerts": [],
+      "check_frequency_hours": 6
     }
   ],
   "price_history": [
