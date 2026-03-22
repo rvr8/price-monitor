@@ -99,31 +99,40 @@ class handler(BaseHTTPRequestHandler):
             product["last_checked"] = now
             db["last_checked"] = now
 
-            # Commit with retry on SHA conflict (409)
-            price_records = [h for h in db["price_history"] if h.get("checked_at") == now]
+            # Commit with retry on SHA conflict
+            price_records = [h for h in db["price_history"] if h.get("checked_at") == now and h.get("product_id") == product_id]
+            committed = False
             for attempt in range(3):
                 try:
                     _put_db_to_github(db, sha, f"check: {product['name']} (manual)")
+                    committed = True
                     break
                 except Exception as e:
-                    if "409" in str(e) and attempt < 2:
-                        # SHA conflict — re-fetch and re-apply our changes
+                    if attempt < 2:
                         import time
-                        time.sleep(1)
-                        db, sha = _get_db_from_github()
-                        product = next((p for p in db["products"] if p["id"] == product_id), None)
-                        if product:
-                            product["last_checked"] = now
-                            db["price_history"].extend(price_records)
-                            db["last_checked"] = now
+                        time.sleep(2)
+                        try:
+                            db, sha = _get_db_from_github()
+                            product = next((p for p in db["products"] if p["id"] == product_id), None)
+                            if product:
+                                product["last_checked"] = now
+                                db["price_history"].extend(price_records)
+                                db["last_checked"] = now
+                        except Exception:
+                            pass
                     else:
-                        raise
+                        self._json_response(500, {
+                            "error": f"Failed to save after 3 attempts: {str(e)[:100]}",
+                            "prices_checked": checked,
+                        })
+                        return
 
             self._json_response(200, {
                 "status": "checked",
                 "product_id": product_id,
                 "prices_checked": checked,
                 "errors": errors,
+                "saved": committed,
             })
 
         except Exception as e:
