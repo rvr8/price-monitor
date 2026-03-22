@@ -47,10 +47,36 @@ def _put_db_to_github(db, sha, message):
             "content": b64encode(content.encode("utf-8")).decode("ascii"),
             "sha": sha,
         },
-        timeout=15,
+        timeout=30,
     )
     resp.raise_for_status()
     return resp.json()
+
+
+def _check_and_commit(db, sha, product_id, product_name, now, price_records):
+    """Commit with retry + verification. Returns True if saved."""
+    for attempt in range(3):
+        try:
+            _put_db_to_github(db, sha, f"check: {product_name} (manual)")
+            return True
+        except Exception as e:
+            err_str = str(e)
+            if attempt < 2:
+                import time
+                time.sleep(2)
+                try:
+                    db_fresh, sha_fresh = _get_db_from_github()
+                    product = next((p for p in db_fresh["products"] if p["id"] == product_id), None)
+                    if product:
+                        product["last_checked"] = now
+                        db_fresh["price_history"].extend(price_records)
+                        db_fresh["last_checked"] = now
+                        db, sha = db_fresh, sha_fresh
+                except Exception:
+                    pass
+            else:
+                return False
+    return False
 
 
 class handler(BaseHTTPRequestHandler):
@@ -99,40 +125,19 @@ class handler(BaseHTTPRequestHandler):
             product["last_checked"] = now
             db["last_checked"] = now
 
-            # Commit with retry on SHA conflict
             price_records = [h for h in db["price_history"] if h.get("checked_at") == now and h.get("product_id") == product_id]
-            committed = False
-            for attempt in range(3):
-                try:
-                    _put_db_to_github(db, sha, f"check: {product['name']} (manual)")
-                    committed = True
-                    break
-                except Exception as e:
-                    if attempt < 2:
-                        import time
-                        time.sleep(2)
-                        try:
-                            db, sha = _get_db_from_github()
-                            product = next((p for p in db["products"] if p["id"] == product_id), None)
-                            if product:
-                                product["last_checked"] = now
-                                db["price_history"].extend(price_records)
-                                db["last_checked"] = now
-                        except Exception:
-                            pass
-                    else:
-                        self._json_response(500, {
-                            "error": f"Failed to save after 3 attempts: {str(e)[:100]}",
-                            "prices_checked": checked,
-                        })
-                        return
+            saved = _check_and_commit(db, sha, product_id, product["name"], now, price_records)
+
+            if not saved:
+                self._json_response(500, {"error": "Prices checked but failed to save to GitHub", "prices_checked": checked})
+                return
 
             self._json_response(200, {
                 "status": "checked",
                 "product_id": product_id,
                 "prices_checked": checked,
                 "errors": errors,
-                "saved": committed,
+                "saved": True,
             })
 
         except Exception as e:
