@@ -116,35 +116,6 @@
       "last_checked": "2026-03-22T07:10:43Z"
     },
     {
-      "id": "bugaboo-fox-cub-black-stormy-2-in-1",
-      "name": "Bugaboo Fox Cub Black/Stormy 2 in 1",
-      "image_url": "https://www.toysforkids.ro/images/thumbnails/240/290/detailed/119/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1-665954.jpg",
-      "tracked_urls": [
-        {
-          "url": "https://www.toysforkids.ro/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1.html",
-          "retailer": "ToysForKids",
-          "variant_name": "Carucior Bugaboo Fox Cub Black/Stormy Blue 2 in 1"
-        },
-        {
-          "url": "https://www.babygrizz.ro/carucioare-pentru-copii/carucior-bugaboo-fox-cub-black-midnight-black-2-in-1.html",
-          "retailer": "BabyGrizz",
-          "variant_name": "Bugaboo Fox Cub Midnight Black"
-        },
-        {
-          "url": "https://www.babygrizz.ro/carucioare-pentru-copii/carucior-bugaboo-fox-cub-blackdesert-beige-2-in-1.html",
-          "retailer": "BabyGrizz",
-          "variant_name": "Bugaboo Fox Cub Desert Beige"
-        },
-        {
-          "url": "https://poshbaby.ro/produs/carucior-2-in-1-bugaboo-fox-5/",
-          "retailer": "PoshBaby",
-          "variant_name": "Bugaboo Fox 5 2in1"
-        }
-      ],
-      "alerts": [],
-      "last_checked": "2026-03-22T00:55:09Z"
-    },
-    {
       "id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
       "name": "2 in 1 pentru copii Anex Flo spatios si usor",
       "image_url": "https://cdn.babymatters.ro/5/81960/4e98/carucior-2-in-1-pentru-copii-anex-flo-spatios-si-usor-frossy.jpg",
@@ -1876,5 +1847,36 @@
     }
   ],
   "last_checked": "2026-03-22T09:49:43Z",
-  "archived_products": []
+  "archived_products": [
+    {
+      "id": "bugaboo-fox-cub-black-stormy-2-in-1",
+      "name": "Bugaboo Fox Cub Black/Stormy 2 in 1",
+      "image_url": "https://www.toysforkids.ro/images/thumbnails/240/290/detailed/119/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1-665954.jpg",
+      "tracked_urls": [
+        {
+          "url": "https://www.toysforkids.ro/carucior-bugaboo-fox-cub-black-stormy-blue-2-in-1.html",
+          "retailer": "ToysForKids",
+          "variant_name": "Carucior Bugaboo Fox Cub Black/Stormy Blue 2 in 1"
+        },
+        {
+          "url": "https://www.babygrizz.ro/carucioare-pentru-copii/carucior-bugaboo-fox-cub-black-midnight-black-2-in-1.html",
+          "retailer": "BabyGrizz",
+          "variant_name": "Bugaboo Fox Cub Midnight Black"
+        },
+        {
+          "url": "https://www.babygrizz.ro/carucioare-pentru-copii/carucior-bugaboo-fox-cub-blackdesert-beige-2-in-1.html",
+          "retailer": "BabyGrizz",
+          "variant_name": "Bugaboo Fox Cub Desert Beige"
+        },
+        {
+          "url": "https://poshbaby.ro/produs/carucior-2-in-1-bugaboo-fox-5/",
+          "retailer": "PoshBaby",
+          "variant_name": "Bugaboo Fox 5 2in1"
+        }
+      ],
+      "alerts": [],
+      "last_checked": "2026-03-22T00:55:09Z",
+      "archived_at": "2026-03-22T09:53:20Z"
+    }
+  ]
 }
