@@ -81,36 +81,108 @@ def _check_prices_for_urls(tracked_urls, product_id):
 
 
 def _auto_discover_urls(product_name, existing_tracked):
-    """Search all retailers for the same product and return new URLs to track."""
+    """Search our scrapers + Google to find the product across all Romanian shops."""
     from src.scrapers import SEARCHABLE_SCRAPERS, normalize_product_name
 
-    # Retailers we already have URLs for
     existing_retailers = {t["retailer"] for t in existing_tracked}
+    existing_urls = {t["url"] for t in existing_tracked}
     normalized = normalize_product_name(product_name).lower()
     query_words = [w for w in normalized.split() if len(w) > 2]
 
     discovered = []
+
+    # Phase 1: Search our scrapers
     for scraper_class in SEARCHABLE_SCRAPERS:
         scraper = scraper_class()
         if scraper.RETAILER_NAME in existing_retailers:
-            continue  # Already have this retailer
+            continue
         try:
             results = scraper.search(product_name, max_results=5)
             for r in results:
-                # Check if the result matches our product (at least 2 query words in name)
                 name_lower = r.name.lower()
                 matches = sum(1 for w in query_words if w in name_lower)
-                if matches >= min(2, len(query_words)) and r.price:
+                if matches >= min(2, len(query_words)) and r.price and r.url not in existing_urls:
                     discovered.append({
                         "url": r.url,
                         "retailer": r.retailer,
                         "variant_name": r.name[:50],
                     })
-                    break  # One URL per retailer is enough
+                    existing_urls.add(r.url)
+                    existing_retailers.add(r.retailer)
+                    break
         except Exception:
             continue
 
+    # Phase 2: Try DuckDuckGo HTML search for more Romanian shops
+    try:
+        web_urls = _web_find_product_urls(product_name)
+        for wurl in web_urls:
+            if wurl["url"] not in existing_urls and wurl["retailer"] not in existing_retailers:
+                discovered.append(wurl)
+                existing_urls.add(wurl["url"])
+                existing_retailers.add(wurl["retailer"])
+    except Exception:
+        pass
+
     return discovered
+
+
+def _web_find_product_urls(product_name):
+    """Search DuckDuckGo and Bing to find product URLs on Romanian shops."""
+    import httpx
+    from urllib.parse import urlparse, unquote
+
+    all_urls = []
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"}
+    query = product_name.replace(" ", "+")
+
+    # Try DuckDuckGo HTML
+    try:
+        resp = httpx.get(f"https://html.duckduckgo.com/html/?q={query}+pret+lei+Romania", headers=headers, timeout=10)
+        all_urls += re.findall(r'uddg=(https?[^&"]+)', resp.text)
+    except Exception:
+        pass
+
+    # Try Bing
+    try:
+        resp = httpx.get(f"https://www.bing.com/search?q={query}+pret+lei+carucior+Romania&cc=ro", headers=headers, timeout=10)
+        all_urls += re.findall(r'href="(https?://[^"]+\.ro/[^"]+)"', resp.text)
+    except Exception:
+        pass
+
+    # Filter and deduplicate
+    skip_domains = {'google.', 'youtube.', 'facebook.', 'compari.ro', 'price.ro',
+                    'bing.', 'microsoft.', 'duckduckgo.', 'wikipedia.', 'reddit.'}
+
+    results = []
+    seen_domains = set()
+    for raw in all_urls:
+        decoded = unquote(raw).split('&')[0]
+        parsed = urlparse(decoded)
+        domain = parsed.netloc.lower().replace('www.', '')
+
+        if not domain.endswith('.ro'):
+            continue
+        if any(skip in domain for skip in skip_domains):
+            continue
+        if domain in seen_domains:
+            continue
+        if not parsed.path or parsed.path == '/' or len(parsed.path) < 10:
+            continue
+
+        seen_domains.add(domain)
+        retailer_name = domain.split('.')[0].capitalize()
+
+        results.append({
+            "url": decoded,
+            "retailer": retailer_name,
+            "variant_name": f"{product_name} ({retailer_name})"[:50],
+        })
+
+        if len(results) >= 8:
+            break
+
+    return results
 
 
 class handler(BaseHTTPRequestHandler):
