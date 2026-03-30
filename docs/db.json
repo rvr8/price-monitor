@@ -58,7 +58,7 @@
       ],
       "alerts": [],
       "check_frequency_hours": 6,
-      "last_checked": "2026-03-30T03:44:42Z"
+      "last_checked": "2026-03-30T09:50:17Z"
     },
     {
       "id": "product-1",
@@ -113,7 +113,7 @@
       ],
       "alerts": [],
       "check_frequency_hours": 6,
-      "last_checked": "2026-03-30T03:44:42Z"
+      "last_checked": "2026-03-30T09:50:17Z"
     },
     {
       "id": "2-in-1-pentru-copii-anex-flo-spatios-si-usor",
@@ -6620,9 +6620,57 @@
       "original_price": null,
       "in_stock": false,
       "checked_at": "2026-03-30T06:11:10Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6913",
+      "price": 3277.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-30T09:50:17Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.exclusivmag.ro/carucior-cybex-balios-s-lux-2-in-1-cadru-negru-magnolia-pink.html",
+      "price": 2159.0,
+      "original_price": null,
+      "in_stock": false,
+      "checked_at": "2026-03-30T09:50:17Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.erfi.ro/carucior-cybex-balios-s-lux-2-in-1-taupe-stormy-blue-cybex-524001195-2-in-1.html",
+      "price": 3476.0,
+      "original_price": 3862.0,
+      "in_stock": true,
+      "checked_at": "2026-03-30T09:50:17Z"
+    },
+    {
+      "product_id": "balios-s-lux-cybex-2-in-1",
+      "url": "https://www.babygrizz.ro/carucioare-pentru-copii/carucior-cybex-balios-s-lux-2-in-1-taupe-seashell-beige.html",
+      "price": 3375.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-30T09:50:17Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://babymatters.ro/carucior-2-in-1-balios-s-lux-pentru-copii-cu-landou-seashell-beige-cu-cadru-taupe-6891",
+      "price": 1899.0,
+      "original_price": null,
+      "in_stock": true,
+      "checked_at": "2026-03-30T09:50:17Z"
+    },
+    {
+      "product_id": "product-1",
+      "url": "https://www.erfi.ro/carucior-cybex-balios-s-lux-taupe-almond-beige-cybex-524001211.html",
+      "price": 2249.0,
+      "original_price": 2575.0,
+      "in_stock": true,
+      "checked_at": "2026-03-30T09:50:17Z"
     }
   ],
-  "last_checked": "2026-03-30T08:03:21Z",
+  "last_checked": "2026-03-30T09:50:17Z",
   "archived_products": [
     {
       "id": "bugaboo-fox-cub-black-stormy-2-in-1",
